@@ -1,20 +1,15 @@
 {
-    "prefer-stable": true,
-    "autoload": {
-        "psr-4": {
-            "DrupalComposer\\DrupalProject\\": "."
-        }
-    },
-    "scripts": {
-        "post-package-install": [
-          "DrupalComposer\\DrupalProject\\Scripts::hook"
-        ],
-        "post-package-update": [
-          "DrupalComposer\\DrupalProject\\Scripts::hook"
-        ]
-    },
+    "name": "drupal-composer/update-scaffold",
+    "type": "composer-plugin",
     "require": {
-        "monolog/monolog": "1.17.0",
-        "composer/composer": "dev-master"
+        "composer-plugin-api": "^1.0.0"
+    },
+    "autoload": {
+      "psr-4": {
+        "DrupalComposer\\UpdateScaffold\\": "src/"
+      }
+    },
+    "extra": {
+        "class": "DrupalComposer\\UpdateScaffold\\Plugin"
     }
 }
