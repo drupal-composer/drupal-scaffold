@@ -1,5 +1,5 @@
 {
-    "name": "drupal-composer/update-scaffold",
+    "name": "drupal-composer/drupal-scaffold",
     "type": "composer-plugin",
     "require": {
         "composer-plugin-api": "^1.0.0"
