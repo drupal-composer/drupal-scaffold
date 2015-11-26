@@ -2,7 +2,9 @@
     "name": "drupal-composer/drupal-scaffold",
     "type": "composer-plugin",
     "require": {
-        "composer-plugin-api": "^1.0.0"
+        "composer-plugin-api": "^1.0.0",
+        "codegyre/robo": "^0.6.0",
+        "drush/drush": "*"
     },
     "autoload": {
       "psr-4": {
