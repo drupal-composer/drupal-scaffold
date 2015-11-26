@@ -52,4 +52,19 @@ class PluginScripts {
       ), TRUE);
     }
   }
+
+  /**
+   * Helper to get the drush directory.
+   *
+   * @param Composer $composer
+   *
+   * @return string
+   *   The absolute path for the drush directory.
+   */
+  public static function getDrushDir(Composer $composer) {
+    $package = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drush/drush', '*');
+    if ($package) {
+      return $composer->getInstallationManager()->getInstallPath($package);
+    }
+  }
 }
