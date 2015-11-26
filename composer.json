@@ -1,0 +1,20 @@
+{
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "DrupalComposer\\DrupalProject\\": "."
+        }
+    },
+    "scripts": {
+        "post-package-install": [
+          "DrupalComposer\\DrupalProject\\Scripts::hook"
+        ],
+        "post-package-update": [
+          "DrupalComposer\\DrupalProject\\Scripts::hook"
+        ]
+    },
+    "require": {
+        "monolog/monolog": "1.17.0",
+        "composer/composer": "dev-master"
+    }
+}
