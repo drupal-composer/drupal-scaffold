@@ -11,5 +11,8 @@
     },
     "extra": {
         "class": "DrupalComposer\\UpdateScaffold\\Plugin"
+    },
+    "require-dev": {
+        "composer/composer": "dev-master"
     }
 }
