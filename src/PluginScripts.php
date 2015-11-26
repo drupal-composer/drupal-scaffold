@@ -1,14 +1,15 @@
 <?php
 
-namespace DrupalComposer\DrupalProject;
+namespace DrupalComposer\UpdateScaffold;
 
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Package\PackageInterface;
 
-class Scripts {
-  public static function hook(\Composer\Installer\PackageEvent $event){
+class PluginScripts {
+
+  public function postPackage(\Composer\Installer\PackageEvent $event){
     $operation = $event->getOperation();
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
