@@ -6,7 +6,7 @@
  * Time: 20:37
  */
 
-namespace DrupalComposer\UpdateScaffold;
+namespace DrupalComposer\DrupalScaffold;
 
 
 class RoboRunner extends \Robo\Runner {
@@ -17,7 +17,7 @@ class RoboRunner extends \Robo\Runner {
    */
   protected function loadRoboFile()
   {
-    $this->roboClass = '\DrupalComposer\UpdateScaffold\RoboFile';
+    $this->roboClass = '\DrupalComposer\DrupalScaffold\RoboFile';
     return true;
   }
 

@@ -10,11 +10,11 @@
     },
     "autoload": {
       "psr-4": {
-        "DrupalComposer\\UpdateScaffold\\": "src/"
+        "DrupalComposer\\DrupalScaffold\\": "src/"
       }
     },
     "extra": {
-        "class": "DrupalComposer\\UpdateScaffold\\Plugin"
+        "class": "DrupalComposer\\DrupalScaffold\\Plugin"
     },
     "require-dev": {
         "composer/composer": "dev-master"

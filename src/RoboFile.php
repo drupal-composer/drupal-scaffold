@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \DrupalComposer\UpdateScaffold\RoboFile
+ * Contains \DrupalComposer\DrupalScaffold\RoboFile
  */
 
-namespace DrupalComposer\UpdateScaffold;
+namespace DrupalComposer\DrupalScaffold;
 
 
 class RoboFile extends \Robo\Tasks {

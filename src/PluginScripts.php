@@ -1,6 +1,6 @@
 <?php
 
-namespace DrupalComposer\UpdateScaffold;
+namespace DrupalComposer\DrupalScaffold;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;

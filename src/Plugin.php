@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains DrupalComposer\UpdateScaffold\Plugin.
+ * Contains DrupalComposer\DrupalScaffold\Plugin.
  */
 
-namespace DrupalComposer\UpdateScaffold;
+namespace DrupalComposer\DrupalScaffold;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
@@ -21,7 +21,7 @@ use Composer\Script\ScriptEvents;
 class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
-   * @var \DrupalComposer\UpdateScaffold\PluginScripts
+   * @var \DrupalComposer\DrupalScaffold\PluginScripts
    */
   protected $scripts;
 
