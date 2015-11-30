@@ -17,8 +17,8 @@ of your root `composer.json`.
 {
   "extra": {
       "drupal-scaffold-excludes": [
-        'google123.html',
-        'robots.txt'
+        "google123.html",
+        "robots.txt"
       ],
       "drupal-scaffold-excludes-omit-defaults": false,
     }
@@ -26,13 +26,7 @@ of your root `composer.json`.
 ```
 
 With `drupal-scaffold-excludes` you can provide additional paths, that should
-be excluded when updating the project.
-
-With `drupal-scaffold-excludes-omit-defaults` setting to `true`, the plugin does
-not exclude crucial default paths. Make sure you add relevant paths back to 
-`drupal-scaffold-excludes` manually, when using this setting.
-
-The defaults are 
+not be copied or overwritten. Default excludes are provided by the plugin:
 ```
 .gitkeep
 autoload.php
@@ -49,3 +43,7 @@ themes
 profiles
 modules
 ```
+
+With setting `drupal-scaffold-excludes-omit-defaults` to `true`, those defaults
+will be ignored.  Make sure you add relevant paths back to `drupal-scaffold-excludes`
+manually, when enabling this setting.
