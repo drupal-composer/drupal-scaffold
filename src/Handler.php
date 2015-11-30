@@ -10,7 +10,7 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Package\Package;
 use Composer\Package\PackageInterface;
 
-class PluginScripts {
+class Handler {
 
   /**
    * @var \Composer\IO\IOInterface

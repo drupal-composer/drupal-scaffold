@@ -21,9 +21,9 @@ use Composer\Script\ScriptEvents;
 class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
-   * @var \DrupalComposer\DrupalScaffold\PluginScripts
+   * @var \DrupalComposer\DrupalScaffold\Handler
    */
-  protected $scripts;
+  protected $handler;
 
   /**
    * {@inheritdoc}
@@ -33,7 +33,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // functionality and also avoid some debug issues with the plugin being
     // copied on initialisation.
     // @see \Composer\Plugin\PluginManager::registerPackage()
-    $this->scripts = new PluginScripts($composer, $io);
+    $this->scripts = new Handler($composer, $io);
   }
 
   /**
@@ -55,7 +55,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Installer\PackageEvent $event
    */
   public function postPackage(PackageEvent $event) {
-    $this->scripts->postPackage($event);
+    $this->handler->postPackage($event);
   }
 
   /**
@@ -64,6 +64,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Script\Event $event
    */
   public function postCmd($event) {
-    $this->scripts->postCmd($event);
+    $this->handler->postCmd($event);
   }
 }
