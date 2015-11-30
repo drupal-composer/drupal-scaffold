@@ -10,8 +10,10 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginInterface;
 use Composer\Installer\PackageEvent;
+use Composer\Script\ScriptEvents;
 
 /**
  * Composer plugin for handling drupal scaffold.
@@ -41,7 +43,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     return array(
       PackageEvents::POST_PACKAGE_INSTALL => 'postPackage',
       PackageEvents::POST_PACKAGE_UPDATE => 'postPackage',
-      PackageEvents::POST_PACKAGE_UNINSTALL => 'postPackage',
+      //PackageEvents::POST_PACKAGE_UNINSTALL => 'postPackage',
+      ScriptEvents::POST_INSTALL_CMD => 'postCmd',
+      ScriptEvents::POST_UPDATE_CMD => 'postCmd',
     );
   }
 
@@ -52,5 +56,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    */
   public function postPackage(PackageEvent $event) {
     $this->scripts->postPackage($event);
+  }
+
+  public function postCmd($event) {
+    $this->scripts->postCmd($event);
   }
 }

@@ -15,23 +15,10 @@ class PluginScripts {
   /**
    * @var \Composer\IO\IOInterface
    */
-  protected $io;
+  protected $drupalCorePackage;
 
   /**
-   * @var \Composer\Composer
-   */
-  protected $composer;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(Composer $composer, IOInterface $io) {
-    $this->io = $io;
-    $this->composer = $composer;
-  }
-
-  /**
-   * Wraps post package events.
+   * Post package event to collect data of the installed drupal version.
    *
    * @param \Composer\Installer\PackageEvent $event
    */
@@ -44,12 +31,19 @@ class PluginScripts {
       $package = $operation->getTargetPackage();
     }
 
-    //    elseif ($operation instanceof UninstallOperation) {
-    //      $package = $operation->getPackage();
-    //    }
-
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
-      $this->downloadScaffold($event->getComposer(), $package);
+      $this->drupalCorePackage = $package;
+    }
+  }
+
+  /**
+   * Post command event to execute the scaffolding.
+   *
+   * @param $event
+   */
+  public function postCmd($event) {
+    if (isset($this->drupalCorePackage)) {
+      $this->downloadScaffold($event->getComposer(), $this->drupalCorePackage);
     }
   }
 
