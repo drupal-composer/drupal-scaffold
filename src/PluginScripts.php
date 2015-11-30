@@ -39,14 +39,13 @@ class PluginScripts {
   /**
    * Post command event to execute the scaffolding.
    *
-   * @param $event
+   * @param \Composer\Script\Event $event
    */
-  public function postCmd($event) {
+  public function postCmd(\Composer\Script\Event $event) {
     if (isset($this->drupalCorePackage)) {
       $this->downloadScaffold($event->getComposer(), $this->drupalCorePackage);
     }
   }
-
 
   /**
    * Downloads drupal scaffold files.

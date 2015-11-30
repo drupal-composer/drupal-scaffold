@@ -50,7 +50,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Pre Package event behaviour for backing up preserved paths.
+   * Post package event behaviour.
    *
    * @param \Composer\Installer\PackageEvent $event
    */
@@ -58,6 +58,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     $this->scripts->postPackage($event);
   }
 
+  /**
+   * Post command event callback.
+   *
+   * @param \Composer\Script\Event $event
+   */
   public function postCmd($event) {
     $this->scripts->postCmd($event);
   }
