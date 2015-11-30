@@ -48,7 +48,7 @@ class PluginScripts {
     //      $package = $operation->getPackage();
     //    }
 
-    if (isset($package) && $package instanceof PackageInterface) {
+    if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
       $this->downloadScaffold($event->getComposer(), $package);
     }
   }
