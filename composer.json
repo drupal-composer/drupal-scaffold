@@ -1,6 +1,8 @@
 {
     "name": "drupal-composer/drupal-scaffold",
+    "description": "Composer Plugin for updating the Drupal scaffold files when using drupal/core",
     "type": "composer-plugin",
+    "license": "GPL-2.0+",
     "require": {
         "composer-plugin-api": "^1.0.0",
         "codegyre/robo": "^0.6.0",
