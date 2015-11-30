@@ -74,7 +74,7 @@ class PluginScripts {
       'drupal_scaffold:download',
       $drupalCorePackage->getPrettyVersion(),
       '--drush',
-      $this->getDrushDir($composer),
+      $this->getDrushDir($composer) . '/drush',
       '--webroot',
       $webroot,
     ));
