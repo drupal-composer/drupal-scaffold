@@ -9,6 +9,8 @@ namespace DrupalComposer\DrupalScaffold;
 
 class RoboFile extends \Robo\Tasks {
 
+  const DELIMITER_EXCLUDE = ',';
+
   /**
    * Build temp folder path for the task.
    *
@@ -28,10 +30,12 @@ class RoboFile extends \Robo\Tasks {
   public function drupal_scaffoldDownload($version = '8', $options = array(
     'drush' => 'vendor/bin/drush',
     'webroot' => 'web',
+    'excludes' => '',
   )) {
 
     $drush = $options['drush'];
     $webroot = $options['webroot'];
+    $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
     $tmpDir = $this->getTmpDir();
     $confDir = $webroot . '/sites/default';
 
@@ -44,9 +48,11 @@ class RoboFile extends \Robo\Tasks {
       ->chmod($confDir, 0755)
       ->run();
 
+    // Make sure we have an empty temp dir.
     $this->taskCleanDir([$tmpDir])
       ->run();
 
+    // Gets the source via drush.
     $this->taskExec($drush)
       ->args(['dl', 'drupal-' . $version])
       ->args("--root=$tmpDir")
@@ -56,26 +62,15 @@ class RoboFile extends \Robo\Tasks {
       ->args('--yes')
       ->run();
 
-    $this->taskRsync()
+    $rsync = $this->taskRsync()
       ->fromPath("$tmpDir/drupal-8/")
       ->toPath($webroot)
       ->args('-a', '-v', '-z')
-      ->args('--delete')
-      ->exclude('.gitkeep')
-      ->exclude('autoload.php')
-      ->exclude('composer.json')
-      ->exclude('composer.lock')
-      ->exclude('core')
-      ->exclude('drush')
-      ->exclude('example.gitignore')
-      ->exclude('LICENSE.txt')
-      ->exclude('README.txt')
-      ->exclude('vendor')
-      ->exclude('sites')
-      ->exclude('themes')
-      ->exclude('profiles')
-      ->exclude('modules')
-      ->run();
+      ->args('--delete');
+    foreach ($excludes as $exclude) {
+      $rsync->exclude($exclude);
+    }
+    $rsync->run();
 
     $default_settings = [
       'sites/default/default.settings.php',

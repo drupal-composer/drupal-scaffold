@@ -61,6 +61,9 @@ class Handler {
     // Webroot is the parent path of the drupal core installation path.
     $webroot = dirname($corePath);
 
+    // Collect excludes.
+    $excludes = $this->getExcludes($composer);
+
     $robo = new RoboRunner();
     $robo->execute(array(
       'robo',
@@ -70,6 +73,8 @@ class Handler {
       $this->getDrushDir($composer) . '/drush',
       '--webroot',
       $webroot,
+      '--excludes',
+      implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
     ));
   }
 
@@ -86,5 +91,52 @@ class Handler {
     if ($package) {
       return $composer->getInstallationManager()->getInstallPath($package);
     }
+  }
+
+  /**
+   * Retrieve excludes from optional "extra" configuration.
+   *
+   * @param Composer $composer
+   *
+   * @return array
+   */
+  protected function getExcludes(Composer $composer) {
+    $extra = $composer->getPackage()->getExtra();
+    $excludes = array();
+    if (empty($extra['drupal-scaffold-excludes-omit-defaults'])) {
+      $excludes = $this->getExcludesDefault();
+    }
+
+    if (isset($extra['drupal-scaffold-excludes'])) {
+      if (is_array($extra['drupal-scaffold-excludes'])) {
+        $excludes = array_merge($excludes, $extra['drupal-scaffold-excludes']);
+      }
+      else {
+        $excludes[] = $extra['drupal-scaffold-excludes'];
+      }
+    }
+    return $excludes;
+  }
+
+  /**
+   * Holds default excludes.
+   */
+  protected function getExcludesDefault() {
+    return array(
+      '.gitkeep',
+      'autoload.php',
+      'composer.json',
+      'composer.lock',
+      'core',
+      'drush',
+      'example.gitignore',
+      'LICENSE.txt',
+      'README.txt',
+      'vendor',
+      'sites',
+      'themes',
+      'profiles',
+      'modules',
+    );
   }
 }
