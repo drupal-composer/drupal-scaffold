@@ -57,8 +57,10 @@ class RoboFile extends \Robo\Tasks {
       ->run();
 
     $this->taskRsync()
-      ->fromPath("$tmpDir/drupal-8")
+      ->fromPath("$tmpDir/drupal-8/")
       ->toPath($webroot)
+      ->args('-a', '-v', '-z')
+      ->args('--delete')
       ->exclude('.gitkeep')
       ->exclude('autoload.php')
       ->exclude('composer.json')
