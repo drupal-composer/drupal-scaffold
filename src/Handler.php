@@ -101,28 +101,37 @@ class Handler {
    * @return array
    */
   protected function getExcludes(Composer $composer) {
-    $extra = $composer->getPackage()->getExtra();
+    $options = $this->getOptions($composer);
     $excludes = array();
-    if (empty($extra['drupal-scaffold-excludes-omit-defaults'])) {
+    if (empty($options['omit-defaults'])) {
       $excludes = $this->getExcludesDefault();
     }
+    $excludes = array_merge($excludes, (array) $options['excludes']);
 
-    if (isset($extra['drupal-scaffold-excludes'])) {
-      if (is_array($extra['drupal-scaffold-excludes'])) {
-        $excludes = array_merge($excludes, $extra['drupal-scaffold-excludes']);
-      }
-      else {
-        $excludes[] = $extra['drupal-scaffold-excludes'];
-      }
-    }
     return $excludes;
+  }
+
+  /**
+   * Retrieve excludes from optional "extra" configuration.
+   *
+   * @param Composer $composer
+   *
+   * @return array
+   */
+  protected function getOptions(Composer $composer) {
+    $extra = $composer->getPackage()->getExtra() + ['drupal-scaffold' => []];
+    $options = $extra['drupal-scaffold'] + [
+      'omit-defaults' => FALSE,
+      'excludes' => [],
+    ];
+    return $options;
   }
 
   /**
    * Holds default excludes.
    */
   protected function getExcludesDefault() {
-    return array(
+    return [
       '.gitkeep',
       'autoload.php',
       'composer.json',
@@ -137,6 +146,6 @@ class Handler {
       'themes',
       'profiles',
       'modules',
-    );
+    ];
   }
 }

@@ -16,17 +16,20 @@ of your root `composer.json`.
 ```json
 {
   "extra": {
-      "drupal-scaffold-excludes": [
+    "drupal-scaffold": {
+      "excludes": [
         "google123.html",
         "robots.txt"
       ],
-      "drupal-scaffold-excludes-omit-defaults": false,
+      "omit-defaults": false
     }
+  }
 }
 ```
 
-With `drupal-scaffold-excludes` you can provide additional paths, that should
-not be copied or overwritten. Default excludes are provided by the plugin:
+With the `drupal-scaffold` option `excludes`, you can provide additional paths 
+that should not be copied or overwritten. Default excludes are provided by the 
+plugin:
 ```
 .gitkeep
 autoload.php
@@ -44,6 +47,7 @@ profiles
 modules
 ```
 
-With setting `drupal-scaffold-excludes-omit-defaults` to `true`, those defaults
-will be ignored.  Make sure you add relevant paths back to `drupal-scaffold-excludes`
-manually, when enabling this setting.
+When setting `omit-defaults` to `true`, the defaults excludes will not be
+provided; in this instance, only those files listed in `excludes` will be
+excluded.  Make sure that the `excludes` option contains all relevant paths,
+as anything not listed here will be overwritten when using `omit-defaults`.
