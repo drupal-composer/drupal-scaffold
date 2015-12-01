@@ -33,7 +33,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // functionality and also avoid some debug issues with the plugin being
     // copied on initialisation.
     // @see \Composer\Plugin\PluginManager::registerPackage()
-    $this->scripts = new Handler($composer, $io);
+    $this->handler = new Handler($composer, $io);
   }
 
   /**
