@@ -1,13 +1,15 @@
 <?php
 
+/**
+ * @file
+ * Contains \DrupalComposer\DrupalScaffold\Handler.
+ */
+
 namespace DrupalComposer\DrupalScaffold;
 
 use Composer\Composer;
-use Composer\IO\IOInterface;
 use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
-use Composer\Package\Package;
 use Composer\Package\PackageInterface;
 
 class Handler {
@@ -43,7 +45,20 @@ class Handler {
    */
   public function postCmd(\Composer\Script\Event $event) {
     if (isset($this->drupalCorePackage)) {
-      $this->downloadScaffold($event->getComposer(), $this->drupalCorePackage);
+      static::downloadScaffold($event->getComposer(), $this->drupalCorePackage);
+    }
+  }
+
+  /**
+   * Script callback for putting in composer scripts.
+   *
+   * @param \Composer\Script\Event $event
+   */
+  public static function command(\Composer\Script\Event $event) {
+    $composer = $event->getComposer();
+    $package = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drupal/core', '*');
+    if ($package) {
+      static::downloadScaffold($composer, $package);
     }
   }
 
@@ -55,14 +70,14 @@ class Handler {
    * @param PackageInterface $drupalCorePackage
    *  Composer package information about the installed core package.
    */
-  protected function downloadScaffold(Composer $composer, PackageInterface $drupalCorePackage) {
+  protected static function downloadScaffold(Composer $composer, PackageInterface $drupalCorePackage) {
     $installationManager = $composer->getInstallationManager();
     $corePath = $installationManager->getInstallPath($drupalCorePackage);
     // Webroot is the parent path of the drupal core installation path.
     $webroot = dirname($corePath);
 
     // Collect excludes.
-    $excludes = $this->getExcludes($composer);
+    $excludes = static::getExcludes($composer);
 
     $robo = new RoboRunner();
     $robo->execute(array(
@@ -70,7 +85,7 @@ class Handler {
       'drupal_scaffold:download',
       $drupalCorePackage->getPrettyVersion(),
       '--drush',
-      $this->getDrushDir($composer) . '/drush',
+      static::getDrushDir($composer) . '/drush',
       '--webroot',
       $webroot,
       '--excludes',
@@ -100,11 +115,11 @@ class Handler {
    *
    * @return array
    */
-  protected function getExcludes(Composer $composer) {
-    $options = $this->getOptions($composer);
+  protected static function getExcludes(Composer $composer) {
+    $options = static::getOptions($composer);
     $excludes = array();
     if (empty($options['omit-defaults'])) {
-      $excludes = $this->getExcludesDefault();
+      $excludes = static::getExcludesDefault();
     }
     $excludes = array_merge($excludes, (array) $options['excludes']);
 
@@ -118,7 +133,7 @@ class Handler {
    *
    * @return array
    */
-  protected function getOptions(Composer $composer) {
+  protected static function getOptions(Composer $composer) {
     $extra = $composer->getPackage()->getExtra() + ['drupal-scaffold' => []];
     $options = $extra['drupal-scaffold'] + [
       'omit-defaults' => FALSE,
@@ -130,7 +145,7 @@ class Handler {
   /**
    * Holds default excludes.
    */
-  protected function getExcludesDefault() {
+  protected static function getExcludesDefault() {
     return [
       '.gitkeep',
       'autoload.php',
