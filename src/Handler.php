@@ -37,7 +37,19 @@ class Handler {
   }
 
   /**
-   * Execute the scaffolding update.
+   * Execute the scaffolding update after an install or update command.
+   *
+   * @param \Composer\Script\Event $event
+   */
+  public function postCmd(\Composer\Script\Event $event) {
+    $package = $this->drupalCorePackage;
+    if ($package) {
+      $this->downloadScaffold($event->getComposer(), $package);
+    }
+  }
+
+  /**
+   * Execute the scaffolding update by request.
    *
    * @param \Composer\Script\Event $event
    */

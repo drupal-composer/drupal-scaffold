@@ -70,7 +70,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Script\Event $event
    */
   public function postCmd($event) {
-    $this->handler->scaffoldCmd($event);
+    $this->handler->postCmd($event);
   }
 
   /**
