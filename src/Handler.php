@@ -13,7 +13,7 @@ use Composer\Package\PackageInterface;
 class Handler {
 
   /**
-   * @var \Composer\IO\IOInterface
+   * @var \Composer\Package\PackageInterface
    */
   protected $drupalCorePackage;
 
@@ -37,14 +37,27 @@ class Handler {
   }
 
   /**
-   * Post command event to execute the scaffolding.
+   * Execute the scaffolding update.
    *
    * @param \Composer\Script\Event $event
    */
-  public function postCmd(\Composer\Script\Event $event) {
-    if (isset($this->drupalCorePackage)) {
-      $this->downloadScaffold($event->getComposer(), $this->drupalCorePackage);
+  public function scaffoldCmd(\Composer\Script\Event $event) {
+    $package = $this->getDrupalCorePackage($event->getComposer());
+    if ($package) {
+      $this->downloadScaffold($event->getComposer(), $package);
     }
+  }
+
+  /**
+   * Look up the Drupal core package object, or return it from
+   * where we cached it in the $drupalCorePackage field.
+   */
+  protected function getDrupalCorePackage($composer) {
+    if (isset($this->drupalCorePackage)) {
+      return $this->drupalCorePackage;
+    }
+    $package = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drupal/core', '*');
+    $this->drupalCorePackage = $package;
   }
 
   /**

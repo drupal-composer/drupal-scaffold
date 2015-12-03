@@ -47,7 +47,24 @@ profiles
 modules
 ```
 
-When setting `omit-defaults` to `true`, the defaults excludes will not be
+When setting `omit-defaults` to `true`, the default excludes will not be
 provided; in this instance, only those files listed in `excludes` will be
-excluded.  Make sure that the `excludes` option contains all relevant paths,
+excluded. Make sure that the `excludes` option contains all relevant paths,
 as anything not listed here will be overwritten when using `omit-defaults`.
+
+## Custom command
+
+The plugin by default only downloads the scaffold files when installing or
+updating `drupal/core`. If you want to call it manually, you have to add the 
+command callback to the `scripts`-section of your root `composer.json`, like this:
+
+```json
+{
+  "scripts": {
+    "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::command"
+  }
+}
+```
+
+After that you can manually download the scaffold files according to your
+configuration by using `composer drupal-scaffold`.
