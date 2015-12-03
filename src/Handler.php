@@ -94,11 +94,11 @@ class Handler {
     $extra = [];
     switch ($options['method']) {
       case 'drush':
-        $roboCommand = 'drupal_scaffold:drush_download';
+        $roboCommand = 'drupal_scaffold:drush-download';
         $extra = ['--drush', $this->getDrushDir() . '/drush'];
         break;
       case 'http':
-        $roboCommand = 'drupal_scaffold:http_download';
+        $roboCommand = 'drupal_scaffold:http-download';
         $extra = ['--source', $options['source']];
         break;
     }
@@ -165,7 +165,7 @@ class Handler {
    * @return array
    */
   protected function getExcludes() {
-    return getNamedOptionList('excludes', 'getExcludesDefault');
+    return $this->getNamedOptionList('excludes', 'getExcludesDefault');
   }
 
   /**
@@ -174,7 +174,7 @@ class Handler {
    * @return array
    */
   protected function getSettingsFiles() {
-    return getNamedOptionList('settings', 'getSettingFilesDefault');
+    return $this->getNamedOptionList('settings', 'getSettingFilesDefault');
   }
 
   /**
@@ -188,7 +188,7 @@ class Handler {
     $options = $this->getOptions($this->composer);
     $result = array();
     if (empty($options['omit-defaults'])) {
-      $result = $this->getSettingFilesDefault();
+      $result = $this->$defaultFn();
     }
     $result = array_merge($result, (array) $options[$optionName]);
 

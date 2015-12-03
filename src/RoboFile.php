@@ -114,7 +114,7 @@ class RoboFile extends \Robo\Tasks {
 
     // Gets the source and extrat, if necessary
     foreach ($ops as $op) {
-      $fetch->run();
+      $op->run();
     }
 
     // Place scaffold files where they belong in the destination
