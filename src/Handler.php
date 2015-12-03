@@ -84,20 +84,40 @@ class Handler {
     // Webroot is the parent path of the drupal core installation path.
     $webroot = dirname($corePath);
 
-    // Collect excludes.
+    // Collect excludes and settings files.
     $excludes = $this->getExcludes();
+    $settingsFiles = $this->getSettingsFiles();
 
+    // Fetch options, and pass values to Robo based on the method
+    // selected to download the scaffold files.
+    $options = $this->getOptions();
+    $extra = [];
+    switch ($options['method']) {
+      case 'drush':
+        $roboCommand = 'drupal_scaffold:drush_download';
+        $extra = ['--drush', $this->getDrushDir() . '/drush'];
+        break;
+      case 'http':
+        $roboCommand = 'drupal_scaffold:http_download';
+        $extra = ['--source', $options['source']];
+        break;
+    }
+
+    // Run Robo
     $robo = new RoboRunner();
-    $robo->execute(array(
-      'robo',
-      'drupal_scaffold:download',
-      $drupalCorePackage->getPrettyVersion(),
-      '--drush',
-      $this->getDrushDir() . '/drush',
-      '--webroot',
-      $webroot,
-      '--excludes',
-      implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
+    $robo->execute(array_merge(
+      [
+        'robo',
+        $roboCommand,
+        $drupalCorePackage->getPrettyVersion(),
+        '--webroot',
+        $webroot,
+        '--excludes',
+        implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
+        '--settings',
+        implode(RoboFile::DELIMITER_EXCLUDE, $settingsFiles),
+      ],
+      $extra
     ));
   }
 
@@ -145,14 +165,34 @@ class Handler {
    * @return array
    */
   protected function getExcludes() {
-    $options = $this->getOptions($this->composer);
-    $excludes = array();
-    if (empty($options['omit-defaults'])) {
-      $excludes = $this->getExcludesDefault();
-    }
-    $excludes = array_merge($excludes, (array) $options['excludes']);
+    return getNamedOptionList('excludes', 'getExcludesDefault');
+  }
 
-    return $excludes;
+  /**
+   * Retrieve list of additional settings files from optional "extra" configuration.
+   *
+   * @return array
+   */
+  protected function getSettingsFiles() {
+    return getNamedOptionList('settings', 'getSettingFilesDefault');
+  }
+
+  /**
+   * Retrieve a named list of options from optional "extra" configuration.
+   * Respects 'omit-defaults', and either includes or does not include the
+   * default values, as requested.
+   *
+   * @return array
+   */
+  protected function getNamedOptionList($optionName, $defaultFn) {
+    $options = $this->getOptions($this->composer);
+    $result = array();
+    if (empty($options['omit-defaults'])) {
+      $result = $this->getSettingFilesDefault();
+    }
+    $result = array_merge($result, (array) $options[$optionName]);
+
+    return $result;
   }
 
   /**
@@ -165,6 +205,9 @@ class Handler {
     $options = $extra['drupal-scaffold'] + [
       'omit-defaults' => FALSE,
       'excludes' => [],
+      'settings' => [],
+      'method' => 'drush',
+      'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     ];
     return $options;
   }
@@ -188,6 +231,18 @@ class Handler {
       'themes',
       'profiles',
       'modules',
+    ];
+  }
+
+  /**
+   * Holds default settings files list.
+   */
+  protected function getSettingFilesDefault() {
+    return [
+      'sites/default/default.settings.php',
+      'sites/default/default.services.yml',
+      'sites/example.settings.local.php',
+      'sites/example.sites.php'
     ];
   }
 }
