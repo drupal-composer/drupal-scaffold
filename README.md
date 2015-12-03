@@ -61,7 +61,7 @@ command callback to the `scripts`-section of your root `composer.json`, like thi
 ```json
 {
   "scripts": {
-    "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Handler::command"
+    "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold"
   }
 }
 ```

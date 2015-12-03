@@ -55,7 +55,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Installer\PackageEvent $event
    */
   public function postPackage(PackageEvent $event) {
-    $this->handler->postPackage($event);
+    $this->handler->onPostPackageEvent($event);
   }
 
   /**
@@ -64,6 +64,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Script\Event $event
    */
   public function postCmd(\Composer\Script\Event $event) {
-    $this->handler->postCmd($event);
+    $this->handler->onPostCmdEvent($event);
+  }
+
+  /**
+   * Script callback for putting in composer scripts.
+   *
+   * @param \Composer\Script\Event $event
+   */
+  public static function scaffold(\Composer\Script\Event $event) {
+    $handler = new Handler($event->getComposer(), $event->getIO());
+    $handler->downloadScaffold();
   }
 }

@@ -10,21 +10,43 @@ namespace DrupalComposer\DrupalScaffold;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
+use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 
 class Handler {
 
   /**
+   * @var \Composer\Composer
+   */
+  protected $composer;
+
+  /**
    * @var \Composer\IO\IOInterface
+   */
+  protected $io;
+
+  /**
+   * @var \Composer\Package\PackageInterface
    */
   protected $drupalCorePackage;
 
   /**
-   * Post package event to collect data of the installed drupal version.
+   * Handler constructor.
+   *
+   * @param Composer $composer
+   * @param IOInterface $io
+   */
+  public function __construct(Composer $composer, IOInterface $io) {
+    $this->composer = $composer;
+    $this->io = $io;
+  }
+
+  /**
+   * Marks scaffolding to be processed after an install or update command.
    *
    * @param \Composer\Installer\PackageEvent $event
    */
-  public function postPackage(\Composer\Installer\PackageEvent $event){
+  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
     $operation = $event->getOperation();
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
@@ -34,6 +56,8 @@ class Handler {
     }
 
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
+      // By explicitiley setting the core package, the onPostCmdEvent() will
+      // process the scaffolding automatically.
       $this->drupalCorePackage = $package;
     }
   }
@@ -43,41 +67,25 @@ class Handler {
    *
    * @param \Composer\Script\Event $event
    */
-  public function postCmd(\Composer\Script\Event $event) {
+  public function onPostCmdEvent(\Composer\Script\Event $event) {
+    // Only trigger scaffold download, when the drupal core package
     if (isset($this->drupalCorePackage)) {
-      static::downloadScaffold($event->getComposer(), $this->drupalCorePackage);
+      $this->downloadScaffold();
     }
   }
 
   /**
-   * Script callback for putting in composer scripts.
-   *
-   * @param \Composer\Script\Event $event
+   * Downloads drupal scaffold files for the current process.
    */
-  public static function command(\Composer\Script\Event $event) {
-    $composer = $event->getComposer();
-    $package = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drupal/core', '*');
-    if ($package) {
-      static::downloadScaffold($composer, $package);
-    }
-  }
-
-  /**
-   * Downloads drupal scaffold files.
-   *
-   * @param Composer $composer
-   *   The current composer instance.
-   * @param PackageInterface $drupalCorePackage
-   *  Composer package information about the installed core package.
-   */
-  protected static function downloadScaffold(Composer $composer, PackageInterface $drupalCorePackage) {
-    $installationManager = $composer->getInstallationManager();
+  public function downloadScaffold() {
+    $drupalCorePackage = $this->getDrupalCorePackage();
+    $installationManager = $this->composer->getInstallationManager();
     $corePath = $installationManager->getInstallPath($drupalCorePackage);
     // Webroot is the parent path of the drupal core installation path.
     $webroot = dirname($corePath);
 
     // Collect excludes.
-    $excludes = static::getExcludes($composer);
+    $excludes = $this->getExcludes();
 
     $robo = new RoboRunner();
     $robo->execute(array(
@@ -85,7 +93,7 @@ class Handler {
       'drupal_scaffold:download',
       $drupalCorePackage->getPrettyVersion(),
       '--drush',
-      static::getDrushDir($composer) . '/drush',
+      $this->getDrushDir() . '/drush',
       '--webroot',
       $webroot,
       '--excludes',
@@ -94,32 +102,53 @@ class Handler {
   }
 
   /**
-   * Helper to get the drush directory.
+   * Look up the Drupal core package object, or return it from where we cached
+   * it in the $drupalCorePackage field.
    *
-   * @param Composer $composer
+   * @return PackageInterface
+   */
+  public function getDrupalCorePackage() {
+    if (!isset($this->drupalCorePackage)) {
+      $this->drupalCorePackage = $this->getPackage('drupal/core');
+    }
+    return $this->drupalCorePackage;
+  }
+
+  /**
+   * Helper to get the drush directory.
    *
    * @return string
    *   The absolute path for the drush directory.
    */
-  public static function getDrushDir(Composer $composer) {
-    $package = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drush/drush', '*');
+  public function getDrushDir() {
+    $package = $this->getPackage('drush/drush');
     if ($package) {
-      return $composer->getInstallationManager()->getInstallPath($package);
+      return $this->composer->getInstallationManager()->getInstallPath($package);
     }
+  }
+
+  /**
+   * Retrieve a package from the current composer process.
+   *
+   * @param string $name
+   *   Name of the package to get from the current composer installation.
+   *
+   * @return PackageInterface
+   */
+  protected function getPackage($name) {
+    return $this->composer->getRepositoryManager()->getLocalRepository()->findPackage($name, '*');
   }
 
   /**
    * Retrieve excludes from optional "extra" configuration.
    *
-   * @param Composer $composer
-   *
    * @return array
    */
-  protected static function getExcludes(Composer $composer) {
-    $options = static::getOptions($composer);
+  protected function getExcludes() {
+    $options = $this->getOptions($this->composer);
     $excludes = array();
     if (empty($options['omit-defaults'])) {
-      $excludes = static::getExcludesDefault();
+      $excludes = $this->getExcludesDefault();
     }
     $excludes = array_merge($excludes, (array) $options['excludes']);
 
@@ -129,12 +158,10 @@ class Handler {
   /**
    * Retrieve excludes from optional "extra" configuration.
    *
-   * @param Composer $composer
-   *
    * @return array
    */
-  protected static function getOptions(Composer $composer) {
-    $extra = $composer->getPackage()->getExtra() + ['drupal-scaffold' => []];
+  protected function getOptions() {
+    $extra = $this->composer->getPackage()->getExtra() + ['drupal-scaffold' => []];
     $options = $extra['drupal-scaffold'] + [
       'omit-defaults' => FALSE,
       'excludes' => [],
@@ -145,7 +172,7 @@ class Handler {
   /**
    * Holds default excludes.
    */
-  protected static function getExcludesDefault() {
+  protected function getExcludesDefault() {
     return [
       '.gitkeep',
       'autoload.php',
