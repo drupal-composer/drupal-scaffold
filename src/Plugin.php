@@ -81,7 +81,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public static function scaffold(\Composer\Script\Event $event) {
     $composer = $event->getComposer();
     $plugin = static::self($composer);
-    $plugin->dispatch($event, __METHOD__);
+    $plugin->dispatch($event, __FUNCTION__);
   }
 
   /**
