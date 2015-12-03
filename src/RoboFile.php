@@ -90,7 +90,8 @@ class RoboFile extends \Robo\Tasks {
     // Gets the source via wget.
     $fetch = $this->taskExec('wget')
       ->args($source)
-      ->args("--output-file=$archivePath");
+      ->args("--output-file=/dev/null")
+      ->args("--output-document=$archivePath");
 
     // Once this is merged into Robo, we will be able to simply do:
     // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName");

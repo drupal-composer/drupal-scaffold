@@ -20,6 +20,7 @@ use Robo\Task\BaseTask;
 class Extract extends BaseTask
 {
     use \Robo\Common\DynamicParams;
+    use \Robo\Common\Timer;
 
     protected $filename;
     protected $to;
@@ -27,31 +28,6 @@ class Extract extends BaseTask
     public function __construct($filename)
     {
         $this->filename = $filename;
-    }
-
-    function run()
-    {
-        if (!file_exists($this->filename)) {
-            $this->printTaskError("File {$this->filename} does not exist");
-            return false;
-        }
-
-        $text = file_get_contents($this->filename);
-        if ($this->regex) {
-            $text = preg_replace($this->regex, $this->to, $text, -1, $count);
-        } else {
-            $text = str_replace($this->from, $this->to, $text, $count);
-        }
-        if ($count > 0) {
-            $res = file_put_contents($this->filename, $text);
-            if ($res === false) {
-                return Result::error($this, "Error writing to file {$this->filename}.");
-            }
-            $this->printTaskSuccess("<info>{$this->filename}</info> updated. $count items replaced");
-        } else {
-            $this->printTaskInfo("<info>{$this->filename}</info> unchanged. $count items replaced");
-        }
-        return Result::success($this, '', ['replaced' => $count]);
     }
 
   function run() {
@@ -66,18 +42,12 @@ class Extract extends BaseTask
 
     // We will first extract to $extractLocation and then move to $this->to
     $extractLocation = static::getTmpDir();
-    $this->taskFilesystemStack()
-      ->mkdir($extractLocation)
-      ->mkdir(dirname($this->to))
-      ->run();
+    @mkdir($extractLocation);
+    @mkdir(dirname($this->to));
 
     // Perform the extraction of a zip file.
     if (($mimetype == 'application/zip') || ($mimetype == 'application/x-zip')) {
-      $this->taskExec("unzip")
-        ->args($this->filename)
-        ->args("-d")
-        ->args("--destination=$extractLocation")
-        ->run();
+      $command = "unzip {$this->filename} -d --destination=$extractLocation";
     }
     // Otherwise we have a possibly-compressed Tar file.
     // If we are not on Windows, then try to do "tar" in a single operation.
@@ -89,43 +59,41 @@ class Extract extends BaseTask
       elseif ($mimetype == 'application/x-bzip2') {
         $tar_compression_flag = 'j';
       }
-      $this->taskExec("tar")
-        ->args('-C')
-        ->args($extractLocation)
-        ->args("-x${$tar_compression_flag}f")
-        ->args($this->filename)
-        ->run();
+      $command = "tar -C $extractLocation -x{$tar_compression_flag}f {$this->filename}";
     }
-
-    // Now, we want to move the extracted files to $this->to. There
-    // are two possibilities that we must consider:
-    //
-    // (1) Archived files were encapsulated in a folder with an arbitrary name
-    // (2) There was no encapsulating folder, and all the files in the archive
-    //     were extracted into $extractLocation
-    //
-    // In the case of (1), we want to move and rename the encapsulating folder
-    // to $this->to.
-    //
-    // In the case of (2), we will just move and rename $extractLocation.
-    $filesInExtractLocation = glob("$extractLocation/*");
-    $hasEncapsulatingFolder = ((count($filesInExtractLocation) == 1) && is_dir($filesInExtractLocation[0]));
-    if ($hasEncapsulatingFolder) {
-      $this->taskFilesystemStack()
-        ->rename($filesInExtractLocation[0], $this->to);
-      $this->taskDeleteDir($extractLocation)->run();
+    $this->printTaskInfo("Running <info>{$command}</info>");
+    $this->startTimer();
+    exec($command, $output, $status);
+    $this->stopTimer();
+    if ($status == 0) {
+      // Now, we want to move the extracted files to $this->to. There
+      // are two possibilities that we must consider:
+      //
+      // (1) Archived files were encapsulated in a folder with an arbitrary name
+      // (2) There was no encapsulating folder, and all the files in the archive
+      //     were extracted into $extractLocation
+      //
+      // In the case of (1), we want to move and rename the encapsulating folder
+      // to $this->to.
+      //
+      // In the case of (2), we will just move and rename $extractLocation.
+      $filesInExtractLocation = glob("$extractLocation/*");
+      $hasEncapsulatingFolder = ((count($filesInExtractLocation) == 1) && is_dir($filesInExtractLocation[0]));
+      if ($hasEncapsulatingFolder) {
+        rename($filesInExtractLocation[0], $this->to);
+        rmdir($extractLocation);
+      }
+      else {
+        rename($extractLocation, $this->to);
+      }
     }
-    else {
-      $this->taskFilesystemStack()
-        ->rename($extractLocation, $this->to);
-    }
-    return $return;
+    return new Result($this, $status, '', ['time' => $this->getExecutionTime()]);
   }
 
-  protected static function archiveType($archivePath) {
+  protected static function archiveType($filename) {
     $content_type = FALSE;
     if (class_exists('finfo')) {
-      $finfo = new finfo(FILEINFO_MIME_TYPE);
+      $finfo = new \finfo(FILEINFO_MIME_TYPE);
       $content_type = $finfo->file($filename);
       // If finfo cannot determine the content type, then we will try other methods
       if ($content_type == 'application/octet-stream') {
