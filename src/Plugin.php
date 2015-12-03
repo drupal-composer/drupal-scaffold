@@ -26,20 +26,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected $handler;
 
   /**
-   * Recover our plugin instance from the pluginManager.
-   *
-   * Useful for command callbacks, which must be implemented
-   * as static methods.
+   * @var \Composer\IO\IOInterface
    */
-  public static function self(Composer $composer) {
-    $plugins = $composer->getPluginManager()->getPlugins();
-    foreach($plugins as $plugin) {
-      if (strpos(get_class($plugin), __NAMESPACE__ . '\\') === 0) {
-        return $plugin;
-      }
-    }
-    return NULL; // throw?
-  }
+  protected $io;
 
   /**
    * {@inheritdoc}
@@ -50,6 +39,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // copied on initialisation.
     // @see \Composer\Plugin\PluginManager::registerPackage()
     $this->handler = new Handler($composer, $io);
+    $this->io = $io;
   }
 
   /**
@@ -88,10 +78,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    *
    * @param \Composer\Script\Event $event
    */
-  public static function command(\Composer\Script\Event $event) {
+  public static function scaffold(\Composer\Script\Event $event) {
     $composer = $event->getComposer();
     $plugin = static::self($composer);
-    $plugin->dispatch($event);
+    $plugin->dispatch($event, __METHOD__);
   }
 
   /**
@@ -99,7 +89,24 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    *
    * @param \Composer\Script\Event $event
    */
-  public function dispatch(\Composer\Script\Event $event) {
-    $this->handler->scaffoldCmd($event);
+  public function dispatch(\Composer\Script\Event $event, $methodName) {
+    $command = "${methodName}Cmd";
+    $this->handler->$command($event);
+  }
+
+  /**
+   * Recover our plugin instance from the pluginManager.
+   *
+   * Useful for command callbacks, which must be implemented
+   * as static methods. Should not be used for other purposes.
+   */
+  public static function self(Composer $composer) {
+    $plugins = $composer->getPluginManager()->getPlugins();
+    foreach($plugins as $plugin) {
+      if (strpos(get_class($plugin), __NAMESPACE__ . '\\') === 0) {
+        return $plugin;
+      }
+    }
+    return NULL; // throw?
   }
 }

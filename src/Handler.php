@@ -53,11 +53,10 @@ class Handler {
    * where we cached it in the $drupalCorePackage field.
    */
   protected function getDrupalCorePackage($composer) {
-    if (isset($this->drupalCorePackage)) {
-      return $this->drupalCorePackage;
+    if (!isset($this->drupalCorePackage)) {
+      $this->drupalCorePackage = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drupal/core', '*');
     }
-    $package = $composer->getRepositoryManager()->getLocalRepository()->findPackage('drupal/core', '*');
-    $this->drupalCorePackage = $package;
+    return $this->drupalCorePackage;
   }
 
   /**
