@@ -107,11 +107,17 @@ class RoboFile extends \Robo\Tasks {
 
     $this->stopOnFail();
 
-    $confDirOriginalPerms = fileperms($confDir);
+    $confDirOriginalPerms = FALSE;
+    if (is_dir($confDir)) {
+      $confDirOriginalPerms = fileperms($confDir);
+      $this->taskFilesystemStack()
+        ->chmod($confDir, 0755)
+        ->run();
+    }
 
     $this->taskFilesystemStack()
       ->mkdir($tmpDir)
-      ->chmod($confDir, 0755)
+      ->mkdir($confDir)
       ->run();
 
     // Make sure we have an empty temp dir.
@@ -146,8 +152,10 @@ class RoboFile extends \Robo\Tasks {
     // Clean up
     $this->taskDeleteDir($tmpDir)
       ->run();
-    $this->taskFilesystemStack()
-      ->chmod($confDir, $confDirOriginalPerms)
-      ->run();
+    if ($confDirOriginalPerms) {
+      $this->taskFilesystemStack()
+        ->chmod($confDir, $confDirOriginalPerms)
+        ->run();
+    }
   }
 }
