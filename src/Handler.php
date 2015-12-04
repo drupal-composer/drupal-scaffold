@@ -84,41 +84,28 @@ class Handler {
     // Webroot is the parent path of the drupal core installation path.
     $webroot = dirname($corePath);
 
-    // Collect excludes and settings files.
+    // Collect options, excludes and settings files.
+    $options = $this->getOptions();
     $excludes = $this->getExcludes();
     $settingsFiles = $this->getSettingsFiles();
 
-    // Fetch options, and pass values to Robo based on the method
-    // selected to download the scaffold files.
-    $options = $this->getOptions();
-    $extra = [];
-    switch ($options['method']) {
-      case 'drush':
-        $roboCommand = 'drupal_scaffold:drush-download';
-        $extra = ['--drush', $this->getDrushDir() . '/drush'];
-        break;
-      case 'http':
-        $roboCommand = 'drupal_scaffold:http-download';
-        $extra = ['--source', $options['source']];
-        break;
-    }
-
     // Run Robo
     $robo = new RoboRunner();
-    $robo->execute(array_merge(
+    $robo->execute(
       [
         'robo',
-        $roboCommand,
+        'drupal_scaffold:download',
         $drupalCorePackage->getPrettyVersion(),
+        '--source',
+        $options['source'],
         '--webroot',
         $webroot,
         '--excludes',
         implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
         '--settings',
         implode(RoboFile::DELIMITER_EXCLUDE, $settingsFiles),
-      ],
-      $extra
-    ));
+      ]
+    );
   }
 
   /**
@@ -132,19 +119,6 @@ class Handler {
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
-  }
-
-  /**
-   * Helper to get the drush directory.
-   *
-   * @return string
-   *   The absolute path for the drush directory.
-   */
-  public function getDrushDir() {
-    $package = $this->getPackage('drush/drush');
-    if ($package) {
-      return $this->composer->getInstallationManager()->getInstallPath($package);
-    }
   }
 
   /**
@@ -206,7 +180,6 @@ class Handler {
       'omit-defaults' => FALSE,
       'excludes' => [],
       'settings' => [],
-      'method' => 'drush',
       'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     ];
     return $options;

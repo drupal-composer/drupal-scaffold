@@ -32,46 +32,13 @@ class RoboFile extends \Robo\Tasks {
   }
 
   /**
-   * Download scaffold files using Drush
-   * @param string $version
-   *
-   * @param array $options
-   *   Additional options to override path to drush and webroot.
-   */
-  public function drupal_scaffoldDrushDownload($version = '8', $options = array(
-    'drush' => 'vendor/bin/drush',
-    'webroot' => 'web',
-    'excludes' => '',
-    'settings' => '',
-  )) {
-
-    $drush = $options['drush'];
-    $webroot = $options['webroot'];
-    $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
-    $settingsFiles = array_filter(explode(static::DELIMITER_EXCLUDE, $options['settings']));
-    $tmpDir = $this->getTmpDir();
-    $fetchDirName = $this->getFetchDirName();
-
-    // Gets the source via drush.
-    $fetch = $this->taskExec($drush)
-      ->args(['dl', 'drupal-' . $version])
-      ->args("--root=$tmpDir")
-      ->args("--destination=$tmpDir")
-      ->args("--drupal-project-rename=$fetchDirName")
-      ->args('--quiet')
-      ->args('--yes');
-
-    return $this->fetchAndPlaceScaffold($webroot, $tmpDir, $excludes, $settingsFiles, [$fetch]);
-  }
-
-  /**
-   * Download scaffold files using Http
+   * Download scaffold files
    * @param string $version
    *
    * @param array $options
    *   Additional options to override path to webroot and download url.
    */
-  public function drupal_scaffoldHttpDownload($version = '8', $options = array(
+  public function drupal_scaffoldDownload($version = '8', $options = array(
     'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     'webroot' => 'web',
     'excludes' => '',
@@ -80,29 +47,12 @@ class RoboFile extends \Robo\Tasks {
 
     $source = str_replace('{version}', $version, $options['source']);
     $webroot = $options['webroot'];
+    $confDir = $webroot . '/sites/default';
     $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
     $settingsFiles = array_filter(explode(static::DELIMITER_EXCLUDE, $options['settings']));
     $tmpDir = $this->getTmpDir();
     $archiveName = basename($source);
     $archivePath = "$tmpDir/$archiveName";
-    $fetchDirName = $this->getFetchDirName();
-
-    // Gets the source via wget.
-    $fetch = $this->taskExec('wget')
-      ->args($source)
-      ->args("--output-file=/dev/null")
-      ->args("--output-document=$archivePath");
-
-    // Once this is merged into Robo, we will be able to simply do:
-    // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName");
-    $extract = new Extract($archivePath);
-    $extract->to("$tmpDir/$fetchDirName");
-
-    return $this->fetchAndPlaceScaffold($webroot, $tmpDir, $excludes, $settingsFiles, [$fetch, $extract]);
-  }
-
-  protected function fetchAndPlaceScaffold($webroot, $tmpDir, $excludes, $settingsFiles, $ops) {
-    $confDir = $webroot . '/sites/default';
     $fetchDirName = $this->getFetchDirName();
 
     $this->stopOnFail();
@@ -124,10 +74,17 @@ class RoboFile extends \Robo\Tasks {
     $this->taskCleanDir([$tmpDir])
       ->run();
 
-    // Gets the source and extrat, if necessary
-    foreach ($ops as $op) {
-      $op->run();
-    }
+    // Gets the source via wget.
+    $this->taskExec('wget')
+      ->args($source)
+      ->args("--output-file=/dev/null")
+      ->args("--output-document=$archivePath")
+      ->run();
+
+    // Once this is merged into Robo, we will be able to simply do:
+    // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName")->run();
+    $extract = new Extract($archivePath);
+    $extract->to("$tmpDir/$fetchDirName")->run();
 
     // Place scaffold files where they belong in the destination
     $rsync = $this->taskRsync()
