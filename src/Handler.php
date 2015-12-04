@@ -241,6 +241,7 @@ class Handler {
     return [
       'sites/default/default.settings.php',
       'sites/default/default.services.yml',
+      'sites/development.services.yml',
       'sites/example.settings.local.php',
       'sites/example.sites.php'
     ];
