@@ -46,17 +46,19 @@ class Handler {
    *
    * @param \Composer\Installer\PackageEvent $event
    */
-  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
+  public function onPrePackageEvent(\Composer\Installer\PackageEvent $event){
     $operation = $event->getOperation();
-    if ($operation instanceof InstallOperation) {
-      $package = $operation->getPackage();
+    $package = $this->getCorePackage($operation);
+    if ($package && $operation instanceof InstallOperation) {
+      $is_already_installed = $this->getPackage($package->getName());
+      if (!$is_already_installed) {
+        // By explicitly setting the core package, the onPostCmdEvent() will
+        // process the scaffolding automatically.
+        $this->drupalCorePackage = $package;
+      }
     }
-    elseif ($operation instanceof UpdateOperation) {
-      $package = $operation->getTargetPackage();
-    }
-
-    if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
-      // By explicitiley setting the core package, the onPostCmdEvent() will
+    elseif ($package) {
+      // By explicitly setting the core package, the onPostCmdEvent() will
       // process the scaffolding automatically.
       $this->drupalCorePackage = $package;
     }
@@ -189,5 +191,22 @@ class Handler {
       'profiles',
       'modules',
     ];
+  }
+
+  /**
+   * @param $operation
+   * @return mixed
+   */
+  protected function getCorePackage($operation) {
+    if ($operation instanceof InstallOperation) {
+      $package = $operation->getPackage();
+    }
+    elseif ($operation instanceof UpdateOperation) {
+      $package = $operation->getTargetPackage();
+    }
+    if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
+      return $package;
+    }
+    return NULL;
   }
 }
