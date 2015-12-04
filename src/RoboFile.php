@@ -42,14 +42,14 @@ class RoboFile extends \Robo\Tasks {
     'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     'webroot' => 'web',
     'excludes' => '',
-    'settings' => '',
+    'includes' => '',
   )) {
 
     $source = str_replace('{version}', $version, $options['source']);
     $webroot = $options['webroot'];
     $confDir = $webroot . '/sites/default';
     $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
-    $settingsFiles = array_filter(explode(static::DELIMITER_EXCLUDE, $options['settings']));
+    $includes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['includes']));
     $tmpDir = $this->getTmpDir();
     $archiveName = basename($source);
     $archivePath = "$tmpDir/$archiveName";
@@ -99,7 +99,7 @@ class RoboFile extends \Robo\Tasks {
 
     // Place any additional listed settings files
     // (e.g. sites/default/example.settings.php)
-    foreach ($settingsFiles as $file) {
+    foreach ($includes as $file) {
       $this->taskRsync()
         ->fromPath("$tmpDir/$fetchDirName/" . $file)
         ->toPath($webroot . '/' . $file)

@@ -87,7 +87,7 @@ class Handler {
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
     $excludes = $this->getExcludes();
-    $settingsFiles = $this->getSettingsFiles();
+    $includes = $this->getIncludes();
 
     // Run Robo
     $robo = new RoboRunner();
@@ -102,8 +102,8 @@ class Handler {
         $webroot,
         '--excludes',
         implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
-        '--settings',
-        implode(RoboFile::DELIMITER_EXCLUDE, $settingsFiles),
+        '--includes',
+        implode(RoboFile::DELIMITER_EXCLUDE, $includes),
       ]
     );
   }
@@ -147,8 +147,8 @@ class Handler {
    *
    * @return array
    */
-  protected function getSettingsFiles() {
-    return $this->getNamedOptionList('settings', 'getSettingFilesDefault');
+  protected function getIncludes() {
+    return $this->getNamedOptionList('includes', 'getIncludesDefault');
   }
 
   /**
@@ -179,7 +179,7 @@ class Handler {
     $options = $extra['drupal-scaffold'] + [
       'omit-defaults' => FALSE,
       'excludes' => [],
-      'settings' => [],
+      'includes' => [],
       'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     ];
     return $options;
@@ -210,7 +210,7 @@ class Handler {
   /**
    * Holds default settings files list.
    */
-  protected function getSettingFilesDefault() {
+  protected function getIncludesDefault() {
     return [
       'sites/default/default.settings.php',
       'sites/default/default.services.yml',
