@@ -90,21 +90,14 @@ class RoboFile extends \Robo\Tasks {
     $rsync = $this->taskRsync()
       ->fromPath("$tmpDir/$fetchDirName/")
       ->toPath($webroot)
-      ->args('-a', '-v', '-z')
-      ->args('--delete');
+      ->args('-a', '-v', '-z');
+    foreach ($includes as $include) {
+      $rsync->option('include', escapeshellarg($include));
+    }
     foreach ($excludes as $exclude) {
       $rsync->exclude($exclude);
     }
     $rsync->run();
-
-    // Place any additional listed settings files
-    // (e.g. sites/default/example.settings.php)
-    foreach ($includes as $file) {
-      $this->taskRsync()
-        ->fromPath("$tmpDir/$fetchDirName/" . $file)
-        ->toPath($webroot . '/' . $file)
-        ->run();
-    }
 
     // Clean up
     $this->taskDeleteDir($tmpDir)

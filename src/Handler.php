@@ -200,10 +200,10 @@ class Handler {
       'LICENSE.txt',
       'README.txt',
       'vendor',
-      'sites',
       'themes',
       'profiles',
       'modules',
+      'sites/*',
     ];
   }
 
@@ -212,6 +212,8 @@ class Handler {
    */
   protected function getIncludesDefault() {
     return [
+      'sites',
+      'sites/default',
       'sites/default/default.settings.php',
       'sites/default/default.services.yml',
       'sites/development.services.yml',

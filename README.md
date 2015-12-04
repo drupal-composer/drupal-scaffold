@@ -49,18 +49,21 @@ example.gitignore
 LICENSE.txt
 README.txt
 vendor
-sites
 themes
 profiles
 modules
+sites/*
 ```
 
 If there are some files inside of an excluded location that should be
 copied over, they can be individually selected for inclusion via the
 `includes` option.  Default includes are provided by the plugin:
 ```
+sites
+sites/default
 sites/default/default.settings.php
 sites/default/default.services.yml
+sites/development.services.yml
 sites/example.settings.local.php
 sites/example.sites.php
 ```
