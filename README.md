@@ -17,13 +17,12 @@ of your root `composer.json`.
 {
   "extra": {
     "drupal-scaffold": {
-      "method": "http",
       "source": "http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz",
       "excludes": [
         "google123.html",
         "robots.txt"
       ],
-      "settings": [
+      "includes": [
         "sites/default/example.settings.my.php"
       ],
       "omit-defaults": false
@@ -31,10 +30,8 @@ of your root `composer.json`.
   }
 }
 ```
-The `method` setting selects how the scaffold files will be downloaded.
-Currently, `drush` and `http` are supported.  If the `http` method is selected,
-then the `source` option may be used to specify the URL to download the
-scaffold files from.  The default source is drupal.org.  The literal string
+The `source` option may be used to specify the URL to download the
+scaffold files from; the default source is drupal.org.  The literal string
 `{version}` in the `source` option is replaced with the current version of 
 Drupal core being updated prior to download.
 
@@ -58,11 +55,9 @@ profiles
 modules
 ```
 
-Usually, the `sites` folder should be excluded (this is the default); however,
-there are some settings files, such as sites/default/default.settings.php,
-which should be copied over.  Additional scaffold settings files may be
-specified with the `settings` option. Default settings are provided by the
-plugin:
+If there are some files inside of an excluded location that should be
+copied over, they can be individually selected for inclusion via the
+`includes` option.  Default includes are provided by the plugin:
 ```
 sites/default/default.settings.php
 sites/default/default.services.yml
@@ -71,11 +66,10 @@ sites/example.sites.php
 ```
 
 When setting `omit-defaults` to `true`, neither the default excludes nor the
-default setting will be provided; in this instance, only those files listed in 
-`excludes` will be excluded, and only the files listed in `settings` will be
-copied to sites/default. Make sure that the `excludes` option contains all 
-relevant paths, as anything not listed here will be overwritten when using 
-`omit-defaults`.
+default includes will be provided; in this instance, only those files explicitly
+listed in the `excludes` and `includes` options will be considered.  If
+`omit-defaults` is `false` (the default), then any items listed in `excludes`
+or `includes` will be in addition to the usual defaults.
 
 ## Custom command
 
