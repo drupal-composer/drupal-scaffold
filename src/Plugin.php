@@ -44,8 +44,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       PackageEvents::POST_PACKAGE_INSTALL => 'postPackage',
       PackageEvents::POST_PACKAGE_UPDATE => 'postPackage',
       //PackageEvents::POST_PACKAGE_UNINSTALL => 'postPackage',
-      ScriptEvents::POST_INSTALL_CMD => 'postCmd',
-      ScriptEvents::POST_UPDATE_CMD => 'postCmd',
+      ScriptEvents::POST_INSTALL_CMD => 'postInstallCmd',
+      ScriptEvents::POST_UPDATE_CMD => 'postUpdateCmd',
     );
   }
 
@@ -63,8 +63,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    *
    * @param \Composer\Script\Event $event
    */
-  public function postCmd(\Composer\Script\Event $event) {
-    $this->handler->onPostCmdEvent($event);
+  public function postInstallCmd(\Composer\Script\Event $event) {
+    $this->handler->onPostInstallCmdEvent($event);
+  }
+
+  /**
+   * Post command event callback.
+   *
+   * @param \Composer\Script\Event $event
+   */
+  public function postUpdateCmd(\Composer\Script\Event $event) {
+    $this->handler->onPostUpdateCmdEvent($event);
   }
 
   /**

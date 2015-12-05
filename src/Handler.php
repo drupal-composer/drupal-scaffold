@@ -42,20 +42,30 @@ class Handler {
   }
 
   /**
-   * Marks scaffolding to be processed after an install or update command.
-   *
-   * @param \Composer\Installer\PackageEvent $event
+   * @param $operation
+   * @return mixed
    */
-  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
-    $operation = $event->getOperation();
+  protected function getCorePackage($operation) {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
     }
     elseif ($operation instanceof UpdateOperation) {
       $package = $operation->getTargetPackage();
     }
-
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
+      return $package;
+    }
+    return NULL;
+  }
+
+  /**
+   * Marks scaffolding to be processed after an install or update command.
+   *
+   * @param \Composer\Installer\PackageEvent $event
+   */
+  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
+    $package = $this->getCorePackage($event->getOperation());
+    if ($package) {
       // By explicitiley setting the core package, the onPostCmdEvent() will
       // process the scaffolding automatically.
       $this->drupalCorePackage = $package;
@@ -63,12 +73,25 @@ class Handler {
   }
 
   /**
-   * Post command event to execute the scaffolding.
+   * Post install command event to execute the scaffolding.
    *
    * @param \Composer\Script\Event $event
    */
-  public function onPostCmdEvent(\Composer\Script\Event $event) {
-    // Only trigger scaffold download, when the drupal core package
+  public function onPostInstallCmdEvent(\Composer\Script\Event $event) {
+    // TODO: Only install the scaffolding if drupal/core was installed,
+    // AND there are no scaffolding files present.
+    if (isset($this->drupalCorePackage)) {
+      $this->downloadScaffold();
+    }
+  }
+
+  /**
+   * Post update command event to execute the scaffolding.
+   *
+   * @param \Composer\Script\Event $event
+   */
+  public function onPostUpdateCmdEvent(\Composer\Script\Event $event) {
+    // Trigger scaffold downloads every time the drupal core package is updated
     if (isset($this->drupalCorePackage)) {
       $this->downloadScaffold();
     }
