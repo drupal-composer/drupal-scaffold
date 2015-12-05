@@ -74,6 +74,15 @@ listed in the `excludes` and `includes` options will be considered.  If
 `omit-defaults` is `false` (the default), then any items listed in `excludes`
 or `includes` will be in addition to the usual defaults.
 
+## Limitation
+
+When using Composer to install or update the Drupal development branch, the
+scaffold files are always taken from the HEAD of the branch (or, more
+specifically, from the most recent development .tar.gz archive).  This might
+not be what you want when using an old development version (e.g. when the
+version is fixed via composer.lock).  To avoid problems, always commit your
+scaffold files to the repository any time that composer.lock is committed.
+
 ## Custom command
 
 The plugin by default is only downloading the scaffold files when installing or
