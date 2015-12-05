@@ -78,9 +78,9 @@ class Handler {
    * @param \Composer\Script\Event $event
    */
   public function onPostInstallCmdEvent(\Composer\Script\Event $event) {
-    // TODO: Only install the scaffolding if drupal/core was installed,
+    // Only install the scaffolding if drupal/core was installed,
     // AND there are no scaffolding files present.
-    if (isset($this->drupalCorePackage)) {
+    if (isset($this->drupalCorePackage) && !$this->checkScaffoldFiles()) {
       $this->downloadScaffold();
     }
   }
@@ -95,6 +95,31 @@ class Handler {
     if (isset($this->drupalCorePackage)) {
       $this->downloadScaffold();
     }
+  }
+
+  /**
+   * Return 'TRUE' if there are any scaffold files present.
+   *
+   * (Alternatively, rule could be to return TRUE if all
+   * of the scaffold files and directories are present, but
+   * in the case of includes with a glob pattern, this could be
+   * a problem.)
+   */
+  public function checkScaffoldFiles() {
+    $drupalCorePackage = $this->getDrupalCorePackage();
+    $installationManager = $this->composer->getInstallationManager();
+    $corePath = $installationManager->getInstallPath($drupalCorePackage);
+    // Webroot is the parent path of the drupal core installation path.
+    $webroot = dirname($corePath);
+    $includes = $this->getIncludes();
+
+    foreach ($includes as $include) {
+      if (is_file("$webroot/$include")) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
   /**
