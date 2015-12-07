@@ -17,7 +17,7 @@ class RoboFile extends \Robo\Tasks {
    * @return string
    */
   protected function getTmpDir() {
-    return getcwd() . '/tmp' . time();
+    return realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . '/drupal-scaffold-drupal8-' . time();
   }
 
   /**
