@@ -41,11 +41,18 @@ class RoboFile extends \Robo\Tasks {
 
     $this->stopOnFail();
 
-    $confDirOriginalPerms = fileperms($confDir);
+    $fs = $this->taskFilesystemStack()
+      ->mkdir($tmpDir);
 
-    $this->taskFilesystemStack()
-      ->mkdir($tmpDir)
-      ->chmod($confDir, 0755)
+    if (file_exists($confDir)) {
+      $confDirOriginalPerms = fileperms($confDir);
+    }
+    else {
+      $confDirOriginalPerms = 0755;
+      $fs->mkdir($confDir);
+    }
+
+    $fs->chmod($confDir, 0755)
       ->run();
 
     // Make sure we have an empty temp dir.
