@@ -17,6 +17,7 @@
         "class": "DrupalComposer\\DrupalScaffold\\Plugin"
     },
     "require-dev": {
-        "composer/composer": "dev-master"
+        "composer/composer": "dev-master",
+        "phpunit/phpunit": "^4.4.0"
     }
 }

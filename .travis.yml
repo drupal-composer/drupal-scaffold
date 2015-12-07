@@ -1,0 +1,22 @@
+language: php
+php:
+  - 5.5
+  - 5.6
+  - 7.0
+
+sudo: false
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - composer --verbose self-update
+  - composer --version
+
+install:
+  - composer --verbose install
+
+before_script:
+  - git config --global user.email "travisci@example.com"
+  - git config --global user.name "Travis CI Test"
+
+script:
+  - ./vendor/bin/phpunit

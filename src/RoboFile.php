@@ -17,7 +17,7 @@ class RoboFile extends \Robo\Tasks {
    * @return string
    */
   protected function getTmpDir() {
-    return getcwd() . '/tmp' . rand() . time();
+    return realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . '/drupal-scaffold-drupal8-' . time();
   }
 
   /**
@@ -57,17 +57,18 @@ class RoboFile extends \Robo\Tasks {
 
     $this->stopOnFail();
 
-    $confDirOriginalPerms = FALSE;
-    if (is_dir($confDir)) {
+    $fs = $this->taskFilesystemStack()
+      ->mkdir($tmpDir);
+
+    if (file_exists($confDir)) {
       $confDirOriginalPerms = fileperms($confDir);
-      $this->taskFilesystemStack()
-        ->chmod($confDir, 0755)
-        ->run();
+    }
+    else {
+      $confDirOriginalPerms = 0755;
+      $fs->mkdir($confDir);
     }
 
-    $this->taskFilesystemStack()
-      ->mkdir($tmpDir)
-      ->mkdir($confDir)
+    $fs->chmod($confDir, 0755)
       ->run();
 
     // Make sure we have an empty temp dir.
