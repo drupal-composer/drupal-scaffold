@@ -65,10 +65,21 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
   /**
    * Tests a simple composer install without core, but adding core later.
    */
-  public function testComposerInstall() {
+  public function testComposerInstallAndUpdate() {
     $this->composer('install');
-    $this->assertFileExists($this->tmpDir . '/core', 'Drupal core is installed.');
-    $this->assertFileExists($this->tmpDir . '/index.php', 'Scaffold file given.');
+    $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . 'core', 'Drupal core is installed.');
+    $exampleScaffoldFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'index.php';
+    $this->assertFileExists($exampleScaffoldFile, 'Scaffold file given.');
+
+    // We touch a scaffold file, so we can check the file was modified after
+    // the scaffold update.
+    touch($exampleScaffoldFile);
+    $mtime_touched = filemtime($exampleScaffoldFile);
+    // Requiring a newer version triggers "composer update"
+    $this->composer('require drupal/core:"8.0.1"');
+    clearstatcache();
+    $mtime_after = filemtime($exampleScaffoldFile);
+    $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified.');
   }
 
   /**
