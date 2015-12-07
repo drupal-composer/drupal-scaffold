@@ -66,12 +66,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    * Tests a simple composer install without core, but adding core later.
    */
   public function testComposerInstall() {
-    $this->composer('install --no-dev');
-    $this->assertFileNotExists($this->tmpDir . '/core', 'Drupal core is not installed yet.');
-    $this->assertFileNotExists($this->tmpDir . '/index.php', 'No scaffold file given.');
-
-    $this->composer('require drupal/core:8.* --update-no-dev');
-    $this->assertFileExists($this->tmpDir . '/core', 'Drupal core is installed yet.');
+    $this->composer('install');
+    $this->assertFileExists($this->tmpDir . '/core', 'Drupal core is installed.');
     $this->assertFileExists($this->tmpDir . '/index.php', 'Scaffold file given.');
   }
 
@@ -110,6 +106,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
       "require" => array(
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
         "composer/installers" => "^1.0.20",
+        "drupal/core" => "8.0.0",
       ),
     );
   }
