@@ -14,5 +14,9 @@ before_install:
 install:
   - composer --verbose install
 
+before_script:
+  - git config --global user.email "travisci@example.com"
+  - git config --global user.name "Travis CI Test"
+
 script:
   - ./vendor/bin/phpunit
