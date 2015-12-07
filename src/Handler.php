@@ -46,19 +46,33 @@ class Handler {
    *
    * @param \Composer\Installer\PackageEvent $event
    */
-  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
+  public function onPrePackageEvent(\Composer\Installer\PackageEvent $event){
     $operation = $event->getOperation();
-    if ($operation instanceof InstallOperation) {
-      $package = $operation->getPackage();
-    }
-    elseif ($operation instanceof UpdateOperation) {
-      $package = $operation->getTargetPackage();
+    $package = $this->getCorePackage($operation);
+    $locker = $this->composer->getLocker();
+
+    // Package is not drupal/core
+    if (!$package) {
+      return;
     }
 
-    if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
-      // By explicitiley setting the core package, the onPostCmdEvent() will
+    if ($operation instanceof UpdateOperation) {
+      // By explicitly setting the core package, the onPostCmdEvent() will
       // process the scaffolding automatically.
       $this->drupalCorePackage = $package;
+      return;
+    }
+
+    // No composer.lock file present.
+    if (!$locker->isLocked()) {
+      $this->drupalCorePackage = $package;
+      return;
+    }
+
+    // Package is not the composer.lock file
+    if (!$locker->getLockedRepository()->findPackage($package->getName(), '*')) {
+      $this->drupalCorePackage = $package;
+      return;
     }
   }
 
@@ -189,5 +203,22 @@ class Handler {
       'profiles',
       'modules',
     ];
+  }
+
+  /**
+   * @param $operation
+   * @return mixed
+   */
+  protected function getCorePackage($operation) {
+    if ($operation instanceof InstallOperation) {
+      $package = $operation->getPackage();
+    }
+    elseif ($operation instanceof UpdateOperation) {
+      $package = $operation->getTargetPackage();
+    }
+    if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
+      return $package;
+    }
+    return NULL;
   }
 }

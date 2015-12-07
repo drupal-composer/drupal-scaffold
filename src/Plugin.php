@@ -41,9 +41,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return array(
-      PackageEvents::POST_PACKAGE_INSTALL => 'postPackage',
-      PackageEvents::POST_PACKAGE_UPDATE => 'postPackage',
-      //PackageEvents::POST_PACKAGE_UNINSTALL => 'postPackage',
+      PackageEvents::PRE_PACKAGE_INSTALL => 'prePackage',
+      PackageEvents::PRE_PACKAGE_UPDATE => 'prePackage',
       ScriptEvents::POST_INSTALL_CMD => 'postCmd',
       ScriptEvents::POST_UPDATE_CMD => 'postCmd',
     );
@@ -54,8 +53,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    *
    * @param \Composer\Installer\PackageEvent $event
    */
-  public function postPackage(PackageEvent $event) {
-    $this->handler->onPostPackageEvent($event);
+  public function prePackage(PackageEvent $event) {
+    $this->handler->onPrePackageEvent($event);
   }
 
   /**
