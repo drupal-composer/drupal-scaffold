@@ -15,4 +15,4 @@ install:
   - composer --verbose install
 
 script:
-  - pwd
+  - ./vendor/bin/phpunit
