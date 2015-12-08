@@ -201,7 +201,7 @@ class Handler {
       'omit-defaults' => FALSE,
       'excludes' => [],
       'includes' => [],
-      'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
+      'source' => 'https://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     ];
     return $options;
   }

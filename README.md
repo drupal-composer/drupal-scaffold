@@ -17,7 +17,7 @@ of your root `composer.json`.
 {
   "extra": {
     "drupal-scaffold": {
-      "source": "http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz",
+      "source": "https://ftp.drupal.org/files/projects/drupal-{version}.tar.gz",
       "excludes": [
         "google123.html",
         "robots.txt"
@@ -32,11 +32,11 @@ of your root `composer.json`.
 ```
 The `source` option may be used to specify the URL to download the
 scaffold files from; the default source is drupal.org.  The literal string
-`{version}` in the `source` option is replaced with the current version of 
+`{version}` in the `source` option is replaced with the current version of
 Drupal core being updated prior to download.
 
-With the `drupal-scaffold` option `excludes`, you can provide additional paths 
-that should not be copied or overwritten. Default excludes are provided by the 
+With the `drupal-scaffold` option `excludes`, you can provide additional paths
+that should not be copied or overwritten. Default excludes are provided by the
 plugin:
 ```
 .gitkeep
@@ -86,7 +86,7 @@ scaffold files to the repository any time that composer.lock is committed.
 ## Custom command
 
 The plugin by default is only downloading the scaffold files when installing or
-updating `drupal/core`. If you want to call it manually, you have to add the 
+updating `drupal/core`. If you want to call it manually, you have to add the
 command callback to the `scripts`-section of your root `composer.json`, like this:
 
 ```json

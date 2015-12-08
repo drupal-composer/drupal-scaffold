@@ -39,7 +39,7 @@ class RoboFile extends \Robo\Tasks {
    *   Additional options to override path to webroot and download url.
    */
   public function drupal_scaffoldDownload($version = '8', $options = array(
-    'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
+    'source' => 'https://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     'webroot' => 'web',
     'excludes' => '',
     'includes' => '',
