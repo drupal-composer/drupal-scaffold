@@ -31,7 +31,7 @@ of your root `composer.json`.
 }
 ```
 The `source` option may be used to specify the URL to download the
-scaffold files from; the default source is drupal.org.  The literal string
+scaffold files from; the default source is drupal.org. The literal string
 `{version}` in the `source` option is replaced with the current version of
 Drupal core being updated prior to download.
 
@@ -57,7 +57,7 @@ sites/*
 
 If there are some files inside of an excluded location that should be
 copied over, they can be individually selected for inclusion via the
-`includes` option.  Default includes are provided by the plugin:
+`includes` option. Default includes are provided by the plugin:
 ```
 sites
 sites/default
@@ -70,7 +70,7 @@ sites/example.sites.php
 
 When setting `omit-defaults` to `true`, neither the default excludes nor the
 default includes will be provided; in this instance, only those files explicitly
-listed in the `excludes` and `includes` options will be considered.  If
+listed in the `excludes` and `includes` options will be considered. If
 `omit-defaults` is `false` (the default), then any items listed in `excludes`
 or `includes` will be in addition to the usual defaults.
 
@@ -78,9 +78,9 @@ or `includes` will be in addition to the usual defaults.
 
 When using Composer to install or update the Drupal development branch, the
 scaffold files are always taken from the HEAD of the branch (or, more
-specifically, from the most recent development .tar.gz archive).  This might
+specifically, from the most recent development .tar.gz archive). This might
 not be what you want when using an old development version (e.g. when the
-version is fixed via composer.lock).  To avoid problems, always commit your
+version is fixed via composer.lock). To avoid problems, always commit your
 scaffold files to the repository any time that composer.lock is committed.
 
 ## Custom command
