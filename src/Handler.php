@@ -252,6 +252,7 @@ class Handler {
       'profiles',
       'modules',
       'sites/*',
+      'sites/default/*'
     ];
   }
 
