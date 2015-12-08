@@ -42,20 +42,30 @@ class Handler {
   }
 
   /**
-   * Marks scaffolding to be processed after an install or update command.
-   *
-   * @param \Composer\Installer\PackageEvent $event
+   * @param $operation
+   * @return mixed
    */
-  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
-    $operation = $event->getOperation();
+  protected function getCorePackage($operation) {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
     }
     elseif ($operation instanceof UpdateOperation) {
       $package = $operation->getTargetPackage();
     }
-
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
+      return $package;
+    }
+    return NULL;
+  }
+
+  /**
+   * Marks scaffolding to be processed after an install or update command.
+   *
+   * @param \Composer\Installer\PackageEvent $event
+   */
+  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
+    $package = $this->getCorePackage($event->getOperation());
+    if ($package) {
       // By explicitiley setting the core package, the onPostCmdEvent() will
       // process the scaffolding automatically.
       $this->drupalCorePackage = $package;
@@ -63,15 +73,26 @@ class Handler {
   }
 
   /**
-   * Post command event to execute the scaffolding.
+   * Post install command event to execute the scaffolding.
    *
    * @param \Composer\Script\Event $event
    */
   public function onPostCmdEvent(\Composer\Script\Event $event) {
-    // Only trigger scaffold download, when the drupal core package
-    if (isset($this->drupalCorePackage)) {
+    // Only install the scaffolding if drupal/core was installed,
+    // AND there are no scaffolding files present.
+    if (isset($this->drupalCorePackage) && $this->checkAction($event)) {
       $this->downloadScaffold();
     }
+  }
+
+  /**
+   * Return 'TRUE' if the download scaffold action should be done.
+   */
+  public function checkAction(\Composer\Script\Event $event) {
+    // TODO: check options based on $event->getName()
+    $options = $this->getOptions();
+
+    return TRUE;
   }
 
   /**
@@ -84,21 +105,28 @@ class Handler {
     // Webroot is the parent path of the drupal core installation path.
     $webroot = dirname($corePath);
 
-    // Collect excludes.
+    // Collect options, excludes and settings files.
+    $options = $this->getOptions();
     $excludes = $this->getExcludes();
+    $includes = $this->getIncludes();
 
+    // Run Robo
     $robo = new RoboRunner();
-    $robo->execute(array(
-      'robo',
-      'drupal_scaffold:download',
-      $drupalCorePackage->getPrettyVersion(),
-      '--drush',
-      $this->getDrushDir() . '/drush',
-      '--webroot',
-      $webroot,
-      '--excludes',
-      implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
-    ));
+    $robo->execute(
+      [
+        'robo',
+        'drupal_scaffold:download',
+        $drupalCorePackage->getPrettyVersion(),
+        '--source',
+        $options['source'],
+        '--webroot',
+        $webroot,
+        '--excludes',
+        implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
+        '--includes',
+        implode(RoboFile::DELIMITER_EXCLUDE, $includes),
+      ]
+    );
   }
 
   /**
@@ -112,19 +140,6 @@ class Handler {
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
-  }
-
-  /**
-   * Helper to get the drush directory.
-   *
-   * @return string
-   *   The absolute path for the drush directory.
-   */
-  public function getDrushDir() {
-    $package = $this->getPackage('drush/drush');
-    if ($package) {
-      return $this->composer->getInstallationManager()->getInstallPath($package);
-    }
   }
 
   /**
@@ -145,14 +160,34 @@ class Handler {
    * @return array
    */
   protected function getExcludes() {
-    $options = $this->getOptions($this->composer);
-    $excludes = array();
-    if (empty($options['omit-defaults'])) {
-      $excludes = $this->getExcludesDefault();
-    }
-    $excludes = array_merge($excludes, (array) $options['excludes']);
+    return $this->getNamedOptionList('excludes', 'getExcludesDefault');
+  }
 
-    return $excludes;
+  /**
+   * Retrieve list of additional settings files from optional "extra" configuration.
+   *
+   * @return array
+   */
+  protected function getIncludes() {
+    return $this->getNamedOptionList('includes', 'getIncludesDefault');
+  }
+
+  /**
+   * Retrieve a named list of options from optional "extra" configuration.
+   * Respects 'omit-defaults', and either includes or does not include the
+   * default values, as requested.
+   *
+   * @return array
+   */
+  protected function getNamedOptionList($optionName, $defaultFn) {
+    $options = $this->getOptions($this->composer);
+    $result = array();
+    if (empty($options['omit-defaults'])) {
+      $result = $this->$defaultFn();
+    }
+    $result = array_merge($result, (array) $options[$optionName]);
+
+    return $result;
   }
 
   /**
@@ -165,6 +200,8 @@ class Handler {
     $options = $extra['drupal-scaffold'] + [
       'omit-defaults' => FALSE,
       'excludes' => [],
+      'includes' => [],
+      'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     ];
     return $options;
   }
@@ -184,10 +221,26 @@ class Handler {
       'LICENSE.txt',
       'README.txt',
       'vendor',
-      'sites',
       'themes',
       'profiles',
       'modules',
+      'sites/*',
+      'sites/default/*'
+    ];
+  }
+
+  /**
+   * Holds default settings files list.
+   */
+  protected function getIncludesDefault() {
+    return [
+      'sites',
+      'sites/default',
+      'sites/default/default.settings.php',
+      'sites/default/default.services.yml',
+      'sites/development.services.yml',
+      'sites/example.settings.local.php',
+      'sites/example.sites.php'
     ];
   }
 }

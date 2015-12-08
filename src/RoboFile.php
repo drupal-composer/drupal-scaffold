@@ -21,23 +21,39 @@ class RoboFile extends \Robo\Tasks {
   }
 
   /**
-   * Downloads
-   * @param null $version
+   * Decide what our fetch directory should be named
+   * (temporary location to stash scaffold files before
+   * moving them to their final destination in the project).
+   *
+   * @return string
+   */
+  protected function getFetchDirName() {
+    return 'drupal-8';
+  }
+
+  /**
+   * Download scaffold files
+   * @param string $version
    *
    * @param array $options
-   *   Additional options to override path to rush and webroot.
+   *   Additional options to override path to webroot and download url.
    */
   public function drupal_scaffoldDownload($version = '8', $options = array(
-    'drush' => 'vendor/bin/drush',
+    'source' => 'http://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
     'webroot' => 'web',
     'excludes' => '',
+    'includes' => '',
   )) {
 
-    $drush = $options['drush'];
+    $source = str_replace('{version}', $version, $options['source']);
     $webroot = $options['webroot'];
-    $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
-    $tmpDir = $this->getTmpDir();
     $confDir = $webroot . '/sites/default';
+    $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
+    $includes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['includes']));
+    $tmpDir = $this->getTmpDir();
+    $archiveName = basename($source);
+    $archivePath = "$tmpDir/$archiveName";
+    $fetchDirName = $this->getFetchDirName();
 
     $this->stopOnFail();
 
@@ -59,46 +75,38 @@ class RoboFile extends \Robo\Tasks {
     $this->taskCleanDir([$tmpDir])
       ->run();
 
-    // Gets the source via drush.
-    $this->taskExec($drush)
-      ->args(['dl', 'drupal-' . $version])
-      ->args("--root=$tmpDir")
-      ->args("--destination=$tmpDir")
-      ->args('--drupal-project-rename=drupal-8')
-      ->args('--quiet')
-      ->args('--yes')
+    // Gets the source via wget.
+    $this->taskExec('wget')
+      ->args($source)
+      ->args("--output-file=/dev/null")
+      ->args("--output-document=$archivePath")
       ->run();
 
+    // Once this is merged into Robo, we will be able to simply do:
+    // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName")->run();
+    $extract = new Extract($archivePath);
+    $extract->to("$tmpDir/$fetchDirName")->run();
+
+    // Place scaffold files where they belong in the destination
     $rsync = $this->taskRsync()
-      ->fromPath("$tmpDir/drupal-8/")
+      ->fromPath("$tmpDir/$fetchDirName/")
       ->toPath($webroot)
-      ->args('-a', '-v', '-z')
-      ->args('--delete');
+      ->args('-a', '-v', '-z');
+    foreach ($includes as $include) {
+      $rsync->option('include', escapeshellarg($include));
+    }
     foreach ($excludes as $exclude) {
       $rsync->exclude($exclude);
     }
     $rsync->run();
 
-    $default_settings = [
-      'sites/default/default.settings.php',
-      'sites/default/default.services.yml',
-      'sites/example.settings.local.php',
-      'sites/example.sites.php'
-    ];
-
-    foreach ($default_settings as $file) {
-      $this->taskRsync()
-        ->fromPath("$tmpDir/drupal-8/" . $file)
-        ->toPath($webroot . '/' . $file)
-        ->run();
-    }
-
+    // Clean up
     $this->taskDeleteDir($tmpDir)
       ->run();
-
-    $this->taskFilesystemStack()
-      ->chmod($confDir, $confDirOriginalPerms)
-      ->run();
+    if ($confDirOriginalPerms) {
+      $this->taskFilesystemStack()
+        ->chmod($confDir, $confDirOriginalPerms)
+        ->run();
+    }
   }
-
 }
