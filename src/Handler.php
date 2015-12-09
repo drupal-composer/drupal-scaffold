@@ -89,10 +89,37 @@ class Handler {
    * Return 'TRUE' if the download scaffold action should be done.
    */
   public function checkAction(\Composer\Script\Event $event) {
-    // TODO: check options based on $event->getName()
-    $options = $this->getOptions();
+    $webroot = $this->getWebRoot();
 
-    return TRUE;
+    // Check options based on $event->getName()
+    $key = $event->getName() . '-action';
+
+    $options = $this->getOptions() + [$key => FALSE];
+
+    if ($options[$key] === TRUE) {
+      return TRUE;
+    }
+    foreach ((array)$options[$key] as $test => $value) {
+      switch ($test) {
+        case 'file-missing':
+          if (!file_exists("$webroot/$value")) {
+            return TRUE;
+          }
+          break;
+        case 'if-env':
+          if (getenv($value)) {
+            return TRUE;
+          }
+          break;
+        case 'if-not-env':
+          if (!getenv($value)) {
+            return TRUE;
+          }
+          break;
+      }
+    }
+
+    return FALSE;
   }
 
   /**
@@ -100,10 +127,7 @@ class Handler {
    */
   public function downloadScaffold() {
     $drupalCorePackage = $this->getDrupalCorePackage();
-    $installationManager = $this->composer->getInstallationManager();
-    $corePath = $installationManager->getInstallPath($drupalCorePackage);
-    // Webroot is the parent path of the drupal core installation path.
-    $webroot = dirname($corePath);
+    $webroot = $this->getWebRoot();
 
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
@@ -140,6 +164,21 @@ class Handler {
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
+  }
+
+  /**
+   * Retrieve the path to the web root.
+   *
+   *  @return string
+   */
+  public function getWebRoot() {
+    $drupalCorePackage = $this->getDrupalCorePackage();
+    $installationManager = $this->composer->getInstallationManager();
+    $corePath = $installationManager->getInstallPath($drupalCorePackage);
+    // Webroot is the parent path of the drupal core installation path.
+    $webroot = dirname($corePath);
+
+    return $webroot;
   }
 
   /**
@@ -202,6 +241,8 @@ class Handler {
       'excludes' => [],
       'includes' => [],
       'source' => 'https://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
+      'post-install-cmd-action' => [ 'file-missing' => 'index.php', ],
+      'post-update-cmd-action' => TRUE,
     ];
     return $options;
   }
