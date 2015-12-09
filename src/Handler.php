@@ -110,6 +110,16 @@ class Handler {
     $excludes = $this->getExcludes();
     $includes = $this->getIncludes();
 
+    // If we run our RoboFile through the robo cli, then the Composer
+    // autoload file is included for us.  It seems that it is necessary
+    // for us to include the autoload.php file when calling our RoboFile
+    // with the RoboRunner.  Classes seem to be autoloaded, but not files.
+    // Phpunit also seems to autoload correctly, so this is not needed
+    // for the unit tests.
+    if (file_exists("/../../../autoload.php")) {
+      include __DIR__ . "/../../../autoload.php";
+    }
+
     // Run Robo
     $robo = new RoboRunner();
     $robo->execute(
