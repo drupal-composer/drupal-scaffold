@@ -113,10 +113,7 @@ class RoboFile extends \Robo\Tasks {
    * @param string $target
    */
   protected function downloadFile($source, $target) {
-    $client = new \Guzzle\Http\Client();
-    $response = $client->get($source)
-      ->setResponseBody($target)
-      ->send();
-    return true;
+    $client = new \GuzzleHttp\Client(['base_uri' => dirname($source) . "/"]);
+    $response = $client->request('GET', basename($source), ['sink' => $target]);
   }
 }
