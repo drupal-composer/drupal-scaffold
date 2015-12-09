@@ -113,14 +113,10 @@ class RoboFile extends \Robo\Tasks {
    * @param string $target
    */
   protected function downloadFile($source, $target) {
-    set_time_limit(0);
-    $fp = fopen ($target, 'w+');
-    $ch = curl_init(urlencode($source));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 50);
-    curl_setopt($ch, CURLOPT_FILE, $fp);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_exec($ch);
-    curl_close($ch);
-    fclose($fp);
+    $client = new \Guzzle\Http\Client();
+    $response = $client->get($source)
+      ->setResponseBody($target)
+      ->send();
+    return true;
   }
 }
