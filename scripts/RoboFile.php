@@ -1,11 +1,10 @@
 <?php
 /**
  * @file
- * Contains \DrupalComposer\DrupalScaffold\RoboFile
+ * Contains \RoboFile
  */
 
-namespace DrupalComposer\DrupalScaffold;
-
+use DrupalComposer\DrupalScaffold\Extract;
 
 class RoboFile extends \Robo\Tasks {
 
@@ -116,4 +115,5 @@ class RoboFile extends \Robo\Tasks {
     $client = new \GuzzleHttp\Client(['base_uri' => dirname($source) . "/"]);
     $response = $client->request('GET', basename($source), ['sink' => $target]);
   }
+
 }

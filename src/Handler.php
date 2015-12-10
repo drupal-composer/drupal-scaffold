@@ -100,10 +100,7 @@ class Handler {
    */
   public function downloadScaffold() {
     $drupalCorePackage = $this->getDrupalCorePackage();
-    $installationManager = $this->composer->getInstallationManager();
-    $corePath = $installationManager->getInstallPath($drupalCorePackage);
-    // Webroot is the parent path of the drupal core installation path.
-    $webroot = dirname($corePath);
+    $webroot = $this->getWebRoot();
 
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
@@ -117,15 +114,15 @@ class Handler {
         'drupal_scaffold:download',
         $drupalCorePackage->getPrettyVersion(),
         '--load-from',
-        __DIR__,
+        dirname(__DIR__) . "/scripts",
         '--source',
         $options['source'],
         '--webroot',
-        $webroot,
+        realpath($webroot),
         '--excludes',
-        implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
+        implode(',', $excludes),
         '--includes',
-        implode(RoboFile::DELIMITER_EXCLUDE, $includes),
+        implode(',', $includes),
       ]
     );
   }
@@ -135,7 +132,7 @@ class Handler {
    */
   public function execute($args) {
     $command = implode(" ", array_map('escapeshellarg', $args));
-    exec($command);
+    passthru($command);
   }
 
   /**
@@ -162,6 +159,21 @@ class Handler {
     if ($package) {
       return $this->composer->getInstallationManager()->getInstallPath($package) . '/robo';
     }
+  }
+
+  /**
+   * Retrieve the path to the web root.
+   *
+   *  @return string
+   */
+  public function getWebRoot() {
+    $drupalCorePackage = $this->getDrupalCorePackage();
+    $installationManager = $this->composer->getInstallationManager();
+    $corePath = $installationManager->getInstallPath($drupalCorePackage);
+    // Webroot is the parent path of the drupal core installation path.
+    $webroot = dirname($corePath);
+
+    return $webroot;
   }
 
   /**
