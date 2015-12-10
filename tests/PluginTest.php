@@ -79,7 +79,17 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     $this->composer('require drupal/core:"8.0.1"');
     clearstatcache();
     $mtime_after = filemtime($exampleScaffoldFile);
-    $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified.');
+    $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update.');
+
+    // We touch a scaffold file, so we can check the file was modified after
+    // the custom commandscaffold update.
+    touch($exampleScaffoldFile);
+    clearstatcache();
+    $mtime_touched = filemtime($exampleScaffoldFile);
+    $this->composer('drupal-scaffold');
+    clearstatcache();
+    $mtime_after = filemtime($exampleScaffoldFile);
+    $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by custom command.');
   }
 
   /**
@@ -108,16 +118,19 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    */
   protected function composerJSONDefaults() {
     return array(
-      "repositories" => array(
+      'repositories' => array(
         array(
-          "type" => 'vcs',
-          "url" => $this->rootDir,
+          'type' => 'vcs',
+          'url' => $this->rootDir,
         )
       ),
-      "require" => array(
+      'require' => array(
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
-        "composer/installers" => "^1.0.20",
-        "drupal/core" => "8.0.0",
+        'composer/installers' => '^1.0.20',
+        'drupal/core' => '8.0.0',
+      ),
+      'scripts' => array(
+        'drupal-scaffold' =>  'DrupalComposer\\DrupalScaffold\\Plugin::scaffold'
       ),
     );
   }
