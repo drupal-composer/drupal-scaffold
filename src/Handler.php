@@ -116,7 +116,7 @@ class Handler {
     // with the RoboRunner.  Classes seem to be autoloaded, but not files.
     // Phpunit also seems to autoload correctly, so this is not needed
     // for the unit tests.
-    if (file_exists("/../../../autoload.php")) {
+    if (file_exists(__DIR__ . "/../../../autoload.php")) {
       include __DIR__ . "/../../../autoload.php";
     }
 
