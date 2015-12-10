@@ -75,12 +75,8 @@ class RoboFile extends \Robo\Tasks {
     $this->taskCleanDir([$tmpDir])
       ->run();
 
-    // Gets the source via wget.
-    $this->taskExec('wget')
-      ->args($source)
-      ->args("--output-file=/dev/null")
-      ->args("--output-document=$archivePath")
-      ->run();
+    // Downloads the source.
+    $this->downloadFile($source, $archivePath);
 
     // Once this is merged into Robo, we will be able to simply do:
     // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName")->run();
@@ -108,5 +104,16 @@ class RoboFile extends \Robo\Tasks {
         ->chmod($confDir, $confDirOriginalPerms)
         ->run();
     }
+  }
+
+  /**
+   * Download file from a source to a target.
+   *
+   * @param string $source
+   * @param string $target
+   */
+  protected function downloadFile($source, $target) {
+    $client = new \GuzzleHttp\Client(['base_uri' => dirname($source) . "/"]);
+    $response = $client->request('GET', basename($source), ['sink' => $target]);
   }
 }
