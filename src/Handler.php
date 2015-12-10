@@ -110,14 +110,23 @@ class Handler {
     $excludes = $this->getExcludes();
     $includes = $this->getIncludes();
 
+    // If we run our RoboFile through the robo cli, then the Composer
+    // autoload file is included for us.  It seems that it is necessary
+    // for us to include the autoload.php file when calling our RoboFile
+    // with the RoboRunner.  Classes seem to be autoloaded, but not files.
+    // Phpunit also seems to autoload correctly, so this is not needed
+    // for the unit tests.
+    if (file_exists(__DIR__ . "/../../../autoload.php")) {
+      include __DIR__ . "/../../../autoload.php";
+    }
+
     // Run Robo
-    $this->execute(
+    $robo = new RoboRunner();
+    $robo->execute(
       [
-        $this->getRoboExecutable(),
+        'robo',
         'drupal_scaffold:download',
         $drupalCorePackage->getPrettyVersion(),
-        '--load-from',
-        __DIR__,
         '--source',
         $options['source'],
         '--webroot',
@@ -131,14 +140,6 @@ class Handler {
   }
 
   /**
-   * Execute the specified command and args in a subprocess.
-   */
-  public function execute($args) {
-    $command = implode(" ", array_map('escapeshellarg', $args));
-    exec($command);
-  }
-
-  /**
    * Look up the Drupal core package object, or return it from where we cached
    * it in the $drupalCorePackage field.
    *
@@ -149,19 +150,6 @@ class Handler {
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
-  }
-
-  /**
-   * Helper to get the robo executable.
-   *
-   * @return string
-   *   The absolute path for the drush directory.
-   */
-  public function getRoboExecutable() {
-    $package = $this->getPackage('codegyre/Robo');
-    if ($package) {
-      return $this->composer->getInstallationManager()->getInstallPath($package) . '/robo';
-    }
   }
 
   /**
