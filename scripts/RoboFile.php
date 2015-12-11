@@ -8,15 +8,13 @@ use DrupalComposer\DrupalScaffold\Extract;
 
 class RoboFile extends \Robo\Tasks {
 
-  const DELIMITER_EXCLUDE = ',';
-
   /**
    * Build temp folder path for the task.
    *
    * @return string
    */
   protected function getTmpDir() {
-    return realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . '/drupal-scaffold-drupal8-' . time();
+    return realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . '/drupal-scaffold-' . time();
   }
 
   /**
@@ -47,8 +45,8 @@ class RoboFile extends \Robo\Tasks {
     $source = str_replace('{version}', $version, $options['source']);
     $webroot = $options['webroot'];
     $confDir = $webroot . '/sites/default';
-    $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
-    $includes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['includes']));
+    $excludes = array_filter(str_getcsv($options['excludes']));
+    $includes = array_filter(str_getcsv($options['includes']));
     $tmpDir = $this->getTmpDir();
     $archiveName = basename($source);
     $archivePath = "$tmpDir/$archiveName";

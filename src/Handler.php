@@ -108,7 +108,7 @@ class Handler {
     $includes = $this->getIncludes();
 
     // Run Robo
-    $this->execute(
+    static::execute(
       [
         $this->getRoboExecutable(),
         'drupal_scaffold:download',
@@ -120,9 +120,9 @@ class Handler {
         '--webroot',
         realpath($webroot),
         '--excludes',
-        implode(',', $excludes),
+        static::array_to_csv($excludes),
         '--includes',
-        implode(',', $includes),
+        static::array_to_csv($includes),
       ]
     );
   }
@@ -130,9 +130,23 @@ class Handler {
   /**
    * Execute the specified command and args in a subprocess.
    */
-  public function execute($args) {
+  public static function execute($args) {
     $command = implode(" ", array_map('escapeshellarg', $args));
     passthru($command);
+  }
+
+  /**
+   * Convert an array into a comma-separated-value string.
+   * Items remain unchanged unless they need to be escaped.
+   *
+   * Compliment of str_getcsv().
+   */
+  public static function array_to_csv($data, $delimiter = ',', $enclosure = '"', $escape = '\\') {
+    return implode(',', array_map(function ($item) use($delimiter, $enclosure, $escape) {
+      $has_delimiter = (strpos($item, $delimiter) !== FALSE);
+      $escaped_item = str_replace([$enclosure, $escape], ["{$escape}{$enclosure}", "{$escape}{$escape}"], $item);
+      return ($has_delimiter || ($item == $escaped_item)) ? $item : "{$escape}{$escaped_item}{$escape}";
+    }, $data));
   }
 
   /**
