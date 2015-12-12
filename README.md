@@ -25,7 +25,11 @@ of your root `composer.json`.
       "includes": [
         "sites/default/example.settings.my.php"
       ],
-      "omit-defaults": false
+      "omit-defaults": false,
+      "post-install-cmd-action": [ 
+        "file-missing": "index.php"
+      ],
+      "post-update-cmd-action": true
     }
   }
 }
@@ -73,6 +77,26 @@ default includes will be provided; in this instance, only those files explicitly
 listed in the `excludes` and `includes` options will be considered. If
 `omit-defaults` is `false` (the default), then any items listed in `excludes`
 or `includes` will be in addition to the usual defaults.
+
+The `post-install-cmd-action` controls whether or not drupal-scaffold will
+download the scaffold files after `composer install` installs `drupal/core`.
+By default, this is done only if the file `index.php` is missing on the local
+filesystem. It is recommended that you commit your scaffold files to your
+repository after they are downloaded the first time. To alter drupal-composer's
+behavior to omit downloading the scaffold files after `composer install`
+when running on the CI server, change the `post-install-cmd-action` option
+as follows:
+```
+  "post-install-cmd-action": [ 
+    "if-not-env": "CI"
+  ],
+```
+The `post-update-cmd-action` option behaves similarly, but controls whether
+the scaffold files are downloaded after `composer update` updates the version
+of the `drupal/core` package. By default, drupal-composer will refresh the
+scaffold files every time this happens. It is not recommended to change this
+preference, as doing so might cause you to miss changes to the scaffold files
+when updating.
 
 ## Limitation
 
