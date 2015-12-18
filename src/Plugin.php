@@ -68,12 +68,24 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Script callback for putting in composer scripts.
+   * Script callback for putting in composer scripts to download the
+   * scaffold files.
    *
    * @param \Composer\Script\Event $event
    */
   public static function scaffold(\Composer\Script\Event $event) {
     $handler = new Handler($event->getComposer(), $event->getIO());
     $handler->downloadScaffold();
+  }
+
+  /**
+   * Script callback for putting in composer scripts to generate the
+   * autoload file at the project root.
+   *
+   * @param \Composer\Script\Event $event
+   */
+  public static function generateAutoload(\Composer\Script\Event $event) {
+    $handler = new Handler($event->getComposer(), $event->getIO());
+    $handler->generateAutoload();
   }
 }
