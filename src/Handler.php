@@ -100,10 +100,7 @@ class Handler {
    */
   public function downloadScaffold() {
     $drupalCorePackage = $this->getDrupalCorePackage();
-    $installationManager = $this->composer->getInstallationManager();
-    $corePath = $installationManager->getInstallPath($drupalCorePackage);
-    // Webroot is the parent path of the drupal core installation path.
-    $webroot = dirname($corePath);
+    $webroot = $this->getWebRoot();
 
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
@@ -111,22 +108,45 @@ class Handler {
     $includes = $this->getIncludes();
 
     // Run Robo
-    $robo = new RoboRunner();
-    $robo->execute(
+    static::execute(
       [
-        'robo',
+        $this->getRoboExecutable(),
         'drupal_scaffold:download',
         $drupalCorePackage->getPrettyVersion(),
+        '--load-from',
+        dirname(__DIR__) . "/scripts",
         '--source',
         $options['source'],
         '--webroot',
-        $webroot,
+        realpath($webroot),
         '--excludes',
-        implode(RoboFile::DELIMITER_EXCLUDE, $excludes),
+        static::array_to_csv($excludes),
         '--includes',
-        implode(RoboFile::DELIMITER_EXCLUDE, $includes),
+        static::array_to_csv($includes),
       ]
     );
+  }
+
+  /**
+   * Execute the specified command and args in a subprocess.
+   */
+  public static function execute($args) {
+    $command = implode(" ", array_map('escapeshellarg', $args));
+    passthru($command);
+  }
+
+  /**
+   * Convert an array into a comma-separated-value string.
+   * Items remain unchanged unless they need to be escaped.
+   *
+   * Compliment of str_getcsv().
+   */
+  public static function array_to_csv($data, $delimiter = ',', $enclosure = '"', $escape = '\\') {
+    return implode(',', array_map(function ($item) use($delimiter, $enclosure, $escape) {
+      $has_delimiter = (strpos($item, $delimiter) !== FALSE);
+      $escaped_item = str_replace([$enclosure, $escape], ["{$escape}{$enclosure}", "{$escape}{$escape}"], $item);
+      return ($has_delimiter || ($item == $escaped_item)) ? $item : "{$escape}{$escaped_item}{$escape}";
+    }, $data));
   }
 
   /**
@@ -140,6 +160,34 @@ class Handler {
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
+  }
+
+  /**
+   * Helper to get the robo executable.
+   *
+   * @return string
+   *   The absolute path for the drush directory.
+   */
+  public function getRoboExecutable() {
+    $package = $this->getPackage('codegyre/Robo');
+    if ($package) {
+      return $this->composer->getInstallationManager()->getInstallPath($package) . '/robo';
+    }
+  }
+
+  /**
+   * Retrieve the path to the web root.
+   *
+   *  @return string
+   */
+  public function getWebRoot() {
+    $drupalCorePackage = $this->getDrupalCorePackage();
+    $installationManager = $this->composer->getInstallationManager();
+    $corePath = $installationManager->getInstallPath($drupalCorePackage);
+    // Webroot is the parent path of the drupal core installation path.
+    $webroot = dirname($corePath);
+
+    return $webroot;
   }
 
   /**

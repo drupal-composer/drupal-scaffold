@@ -1,15 +1,12 @@
 <?php
 /**
  * @file
- * Contains \DrupalComposer\DrupalScaffold\RoboFile
+ * Contains \RoboFile
  */
 
-namespace DrupalComposer\DrupalScaffold;
-
+use DrupalComposer\DrupalScaffold\Extract;
 
 class RoboFile extends \Robo\Tasks {
-
-  const DELIMITER_EXCLUDE = ',';
 
   /**
    * Build temp folder path for the task.
@@ -17,7 +14,7 @@ class RoboFile extends \Robo\Tasks {
    * @return string
    */
   protected function getTmpDir() {
-    return realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . '/drupal-scaffold-drupal8-' . time();
+    return realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . '/drupal-scaffold-' . time();
   }
 
   /**
@@ -48,8 +45,8 @@ class RoboFile extends \Robo\Tasks {
     $source = str_replace('{version}', $version, $options['source']);
     $webroot = $options['webroot'];
     $confDir = $webroot . '/sites/default';
-    $excludes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['excludes']));
-    $includes = array_filter(explode(static::DELIMITER_EXCLUDE, $options['includes']));
+    $excludes = array_filter(str_getcsv($options['excludes']));
+    $includes = array_filter(str_getcsv($options['includes']));
     $tmpDir = $this->getTmpDir();
     $archiveName = basename($source);
     $archivePath = "$tmpDir/$archiveName";
@@ -75,12 +72,8 @@ class RoboFile extends \Robo\Tasks {
     $this->taskCleanDir([$tmpDir])
       ->run();
 
-    // Gets the source via wget.
-    $this->taskExec('wget')
-      ->args($source)
-      ->args("--output-file=/dev/null")
-      ->args("--output-document=$archivePath")
-      ->run();
+    // Downloads the source.
+    $this->downloadFile($source, $archivePath);
 
     // Once this is merged into Robo, we will be able to simply do:
     // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName")->run();
@@ -109,4 +102,16 @@ class RoboFile extends \Robo\Tasks {
         ->run();
     }
   }
+
+  /**
+   * Download file from a source to a target.
+   *
+   * @param string $source
+   * @param string $target
+   */
+  protected function downloadFile($source, $target) {
+    $client = new \GuzzleHttp\Client(['base_uri' => dirname($source) . "/"]);
+    $response = $client->request('GET', basename($source), ['sink' => $target]);
+  }
+
 }
