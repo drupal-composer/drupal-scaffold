@@ -60,6 +60,7 @@ themes
 profiles
 modules
 sites/*
+sites/default/*
 ```
 
 If there are some files inside of an excluded location that should be
