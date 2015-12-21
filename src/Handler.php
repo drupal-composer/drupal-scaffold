@@ -13,6 +13,9 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 
+use Composer\Util\Filesystem;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+
 class Handler {
 
   /**
