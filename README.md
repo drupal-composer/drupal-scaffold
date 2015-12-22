@@ -12,8 +12,12 @@ vendor directory.
 
 ## Usage
 
-`composer require drupal-composer/drupal-scaffold:dev-master` in your composer
+Run `composer require drupal-composer/drupal-scaffold:dev-master` in your composer
 project before installing or updating `drupal/core`.
+
+Once drupal-scaffold is required by your project, it will automatically update
+your scaffold files whenever `composer update` changes the version of
+`drupal/core` installed.
 
 ## Configuration
 
@@ -90,6 +94,8 @@ specifically, from the most recent development .tar.gz archive). This might
 not be what you want when using an old development version (e.g. when the
 version is fixed via composer.lock). To avoid problems, always commit your
 scaffold files to the repository any time that composer.lock is committed.
+Note that the correct scaffold files are retrieved when using a tagged release
+of `drupal/core` (recommended).
 
 ## Custom command
 
@@ -107,3 +113,9 @@ command callback to the `scripts`-section of your root `composer.json`, like thi
 
 After that you can manually download the scaffold files according to your
 configuration by using `composer drupal-scaffold`.
+
+Note that drupal-scaffold does not automatically run after `composer install`.
+It is assumed that the scaffold files will be committed to the repository, to
+ensure that the correct files are used on the CI server (see **Limitation**,
+above).  After running `composer install` for the first time, also run
+`composer drupal-scaffold`, and commit the scaffold files to your repository.

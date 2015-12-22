@@ -83,20 +83,11 @@ class Handler {
   public function onPostCmdEvent(\Composer\Script\Event $event) {
     // Only install the scaffolding if drupal/core was installed,
     // AND there are no scaffolding files present.
-    if (isset($this->drupalCorePackage) && $this->checkAction($event)) {
+    if (isset($this->drupalCorePackage)) {
       $this->downloadScaffold();
+      // Generate the autoload.php file after generating the scaffold files.
       $this->generateAutoload();
     }
-  }
-
-  /**
-   * Return 'TRUE' if the download scaffold action should be done.
-   */
-  public function checkAction(\Composer\Script\Event $event) {
-    // TODO: check options based on $event->getName()
-    $options = $this->getOptions();
-
-    return TRUE;
   }
 
   /**
