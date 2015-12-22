@@ -69,7 +69,9 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     $this->composer('install');
     $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . 'core', 'Drupal core is installed.');
     $exampleScaffoldFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'index.php';
-    $this->assertFileExists($exampleScaffoldFile, 'Scaffold file given.');
+    $this->assertFileNotExists($exampleScaffoldFile, 'Scaffold file should not be automatically installed.');
+    $this->composer('drupal-scaffold');
+    $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be installed by "drupal-scaffold" command.');
 
     // We touch a scaffold file, so we can check the file was modified after
     // the scaffold update.
