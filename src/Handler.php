@@ -175,6 +175,8 @@ class Handler {
    * @return string
    */
   protected function autoLoadContents($relativeVendorPath) {
+    $relativeVendorPath = rtrim($relativeVendorPath, '/');
+
     $autoloadContents = <<<EOF
 <?php
 
