@@ -16,7 +16,10 @@
         }
     },
     "extra": {
-        "class": "DrupalComposer\\DrupalScaffold\\Plugin"
+        "class": "DrupalComposer\\DrupalScaffold\\Plugin",
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     },
     "require-dev": {
         "composer/composer": "dev-master",
