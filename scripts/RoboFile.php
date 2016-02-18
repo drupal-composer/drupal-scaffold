@@ -72,26 +72,18 @@ class RoboFile extends \Robo\Tasks {
     $this->taskCleanDir([$tmpDir])
       ->run();
 
-    // Downloads the source.
+    // Downloads the source and extract
     $this->downloadFile($source, $archivePath);
-
-    // Once this is merged into Robo, we will be able to simply do:
-    // $extract = $this->tastExtract($archivePath)->to("$tmpDir/$fetchDirName")->run();
-    $extract = new Extract($archivePath);
-    $extract->to("$tmpDir/$fetchDirName")->run();
+    $extract = $this->taskExtract($archivePath)->to("$tmpDir/$fetchDirName")->run();
 
     // Place scaffold files where they belong in the destination
-    $rsync = $this->taskRsync()
+    $this->taskRsync()
       ->fromPath("$tmpDir/$fetchDirName/")
       ->toPath($webroot)
-      ->args('-a', '-v', '-z');
-    foreach ($includes as $include) {
-      $rsync->option('include', escapeshellarg($include));
-    }
-    foreach ($excludes as $exclude) {
-      $rsync->exclude($exclude);
-    }
-    $rsync->run();
+      ->args('-a', '-v', '-z')
+      ->includeFilter($includes)
+      ->exclude($excludes)
+      ->run();
 
     // Clean up
     $this->taskDeleteDir($tmpDir)
