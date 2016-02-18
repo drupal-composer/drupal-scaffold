@@ -19,8 +19,8 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class Handler {
 
-  const PRE_SCAFFOLD_CMD = 'pre-scaffold-cmd';
-  const POST_SCAFFOLD_CMD = 'post-scaffold-cmd';
+  const PRE_DRUPAL_SCAFFOLD_CMD = 'pre-drupal-scaffold-cmd';
+  const POST_DRUPAL_SCAFFOLD_CMD = 'post-drupal-scaffold-cmd';
 
   /**
    * @var \Composer\Composer
@@ -108,7 +108,7 @@ class Handler {
 
     // Call any pre-scaffold scripts that may be defined.
     $dispatcher = new EventDispatcher($this->composer, $this->io);
-    $dispatcher->dispatch(self::PRE_SCAFFOLD_CMD);
+    $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
     // Run Robo
     static::execute(
@@ -130,7 +130,7 @@ class Handler {
     );
 
     // Call post-scaffold scripts.
-    $dispatcher->dispatch(self::POST_SCAFFOLD_CMD);
+    $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
   }
 
   /**
