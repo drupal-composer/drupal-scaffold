@@ -12,11 +12,15 @@ use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
+use Composer\EventDispatcher\EventDispatcher;
 
 use Composer\Util\Filesystem;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class Handler {
+
+  const PRE_SCAFFOLD_CMD = 'pre-scaffold-cmd';
+  const POST_SCAFFOLD_CMD = 'post-scaffold-cmd';
 
   /**
    * @var \Composer\Composer
@@ -102,6 +106,10 @@ class Handler {
     $excludes = $this->getExcludes();
     $includes = $this->getIncludes();
 
+    // Call any pre-scaffold scripts that may be defined.
+    $dispatcher = new EventDispatcher($this->composer, $this->io);
+    $dispatcher->dispatch(self::PRE_SCAFFOLD_CMD);
+
     // Run Robo
     static::execute(
       [
@@ -120,6 +128,9 @@ class Handler {
         static::array_to_csv($includes),
       ]
     );
+
+    // Call post-scaffold scripts.
+    $dispatcher->dispatch(self::POST_SCAFFOLD_CMD);
   }
 
   /**
