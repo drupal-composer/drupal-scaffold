@@ -75,12 +75,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codegyre/Robo.git",
-                "reference": "926e496051443fb7c8e85479073b8e4977770028"
+                "reference": "9b17fe0458f02cbf9d04921ad00f277f4933343a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codegyre/Robo/zipball/926e496051443fb7c8e85479073b8e4977770028",
-                "reference": "926e496051443fb7c8e85479073b8e4977770028",
+                "url": "https://api.github.com/repos/Codegyre/Robo/zipball/9b17fe0458f02cbf9d04921ad00f277f4933343a",
+                "reference": "9b17fe0458f02cbf9d04921ad00f277f4933343a",
                 "shasum": ""
             },
             "require": {
@@ -122,7 +122,7 @@
                 }
             ],
             "description": "Modern task runner",
-            "time": "2016-02-17 18:33:53"
+            "time": "2016-02-18 18:03:22"
         },
         {
             "name": "doctrine/collections",

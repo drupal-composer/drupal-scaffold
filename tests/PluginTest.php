@@ -134,6 +134,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
       'scripts' => array(
         'drupal-scaffold' =>  'DrupalComposer\\DrupalScaffold\\Plugin::scaffold'
       ),
+      'minimum-stability' => 'dev',
     );
   }
 
