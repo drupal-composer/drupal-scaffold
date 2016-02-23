@@ -3,6 +3,7 @@
  * @file
  * Contains \RoboFile
  */
+namespace DrupalComposer\DrupalScaffold;
 
 use DrupalComposer\DrupalScaffold\Extract;
 
@@ -102,8 +103,30 @@ class RoboFile extends \Robo\Tasks {
    * @param string $target
    */
   protected function downloadFile($source, $target) {
-    $client = new \GuzzleHttp\Client(['base_uri' => dirname($source) . "/"]);
-    $response = $client->request('GET', basename($source), ['sink' => $target]);
+    $this->say("Attempt to download $source to $target");
+    $fp = fopen($target, 'w+');
+    if (!$fp) {
+      $this->yell('Could not open target file ' . $target);
+      return false;
+    }
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $source);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 100);
+    curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_FILE, $fp);
+    $result = curl_exec($ch);
+    fclose($fp);
+    $details = curl_getinfo($ch);
+    curl_close($ch);
+
+    if (!array_key_exists('http_code', $details) || ($details['http_code'] != '200')) {
+      $this->yell('Could not download ' . $source);
+      return false;
+    }
+    return true;
   }
 
 }

@@ -111,13 +111,12 @@ class Handler {
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
     // Run Robo
-    static::execute(
+    $robo = new RoboRunner();
+    $robo->execute(
       [
-        $this->getRoboExecutable(),
+        'robo',
         'drupal_scaffold:download',
         $drupalCorePackage->getPrettyVersion(),
-        '--load-from',
-        dirname(__DIR__) . "/scripts",
         '--source',
         $options['source'],
         '--webroot',
