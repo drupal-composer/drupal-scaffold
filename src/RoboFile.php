@@ -103,10 +103,10 @@ class RoboFile extends \Robo\Tasks {
    * @param string $target
    */
   protected function downloadFile($source, $target) {
-    $this->say("Attempt to download $source to $target\n");
+    $this->say("Attempt to download $source to $target");
     $fp = fopen($target, 'w+');
     if (!$fp) {
-      $this->yell('Could not open target file ' . $target . "\n");
+      $this->yell('Could not open target file ' . $target);
       return false;
     }
     $ch = curl_init();
@@ -123,7 +123,7 @@ class RoboFile extends \Robo\Tasks {
     curl_close($ch);
 
     if (!array_key_exists('http_code', $details) || ($details['http_code'] != '200')) {
-      $this->yell('Could not download ' . $source . "\n");
+      $this->yell('Could not download ' . $source);
       return false;
     }
     return true;
