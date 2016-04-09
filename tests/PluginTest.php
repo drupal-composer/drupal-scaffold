@@ -78,7 +78,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     touch($exampleScaffoldFile);
     $mtime_touched = filemtime($exampleScaffoldFile);
     // Requiring a newer version triggers "composer update"
-    $this->composer('require drupal/core:"8.0.1"');
+    $this->composer('require drupal/core:"8.1.0-rc1"');
     clearstatcache();
     $mtime_after = filemtime($exampleScaffoldFile);
     $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update.');
@@ -128,13 +128,12 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
       ),
       'require' => array(
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
-        'composer/installers' => '^1.0.20',
-        'drupal/core' => '8.0.0',
+        'composer/installers' => '^1.0.24',
+        'drupal/core' => '8.1.0-rc1',
       ),
       'scripts' => array(
         'drupal-scaffold' =>  'DrupalComposer\\DrupalScaffold\\Plugin::scaffold'
-      ),
-      'minimum-stability' => 'dev',
+      )
     );
   }
 

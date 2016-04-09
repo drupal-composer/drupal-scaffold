@@ -6,8 +6,8 @@ Composer plugin for automatically downloading Drupal scaffold files (like
 It is recommended that the vendor directory be placed in its standard location
 at the project root, outside of the Drupal root; however, the location of the
 vendor directory and the name of the Drupal root may be placed in whatever
-location suits the project.  Drupal-scaffold will generate the autoload.php 
-file at the Drupal root to require the Composer-generated autoload file in the 
+location suits the project.  Drupal-scaffold will generate the autoload.php
+file at the Drupal root to require the Composer-generated autoload file in the
 vendor directory.
 
 ## Usage
@@ -119,3 +119,11 @@ It is assumed that the scaffold files will be committed to the repository, to
 ensure that the correct files are used on the CI server (see **Limitation**,
 above).  After running `composer install` for the first time, also run
 `composer drupal-scaffold`, and commit the scaffold files to your repository.
+
+## Development
+
+To run tests, execute the following command:
+
+```
+composer test
+```
