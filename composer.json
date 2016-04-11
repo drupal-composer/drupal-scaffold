@@ -9,7 +9,8 @@
         "guzzlehttp/guzzle": "~6.2",
         "codegyre/robo": "^0.7.1",
         "pear/archive_tar": "~1.4",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-zlib": "*"
     },
     "autoload": {
         "psr-4": {
