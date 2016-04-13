@@ -81,7 +81,7 @@ class RoboFile extends \Robo\Tasks {
     $this->taskRsync()
       ->fromPath("$tmpDir/$fetchDirName/")
       ->toPath($webroot)
-      ->args('-a', '-v', '-z')
+      ->args('-a', '-v', '-z', '--no-group', '--no-owner')
       ->includeFilter($includes)
       ->exclude($excludes)
       ->run();
