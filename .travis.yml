@@ -19,4 +19,4 @@ before_script:
   - git config --global user.name "Travis CI Test"
 
 script:
-  - ./vendor/bin/phpunit
+  - composer test

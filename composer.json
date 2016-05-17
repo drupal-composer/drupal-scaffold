@@ -6,9 +6,9 @@
     "require": {
         "php": ">=5.4.5",
         "composer-plugin-api": "^1.0.0",
-        "guzzlehttp/guzzle": "~6.1",
+        "guzzlehttp/guzzle": "~6.2",
         "codegyre/robo": "^0.7.1",
-        "pear/archive_tar": "~1.0",
+        "pear/archive_tar": "~1.4",
         "ext-curl": "*",
         "ext-zlib": "*"
     },
@@ -23,8 +23,11 @@
             "dev-master": "1.0.x-dev"
         }
     },
+    "scripts": {
+        "test": "phpunit"
+    },
     "require-dev": {
-        "composer/composer": "dev-master",
-        "phpunit/phpunit": "^4.4.0"
+        "composer/composer": "^1.0.0",
+        "phpunit/phpunit": "^5.3.1"
     }
 }
