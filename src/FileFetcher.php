@@ -9,9 +9,6 @@ namespace DrupalComposer\DrupalScaffold;
 
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
-use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
-use Psr\Http\Message\ResponseInterface;
 
 class FileFetcher {
 

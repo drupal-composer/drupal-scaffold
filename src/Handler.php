@@ -15,7 +15,6 @@ use Composer\Package\PackageInterface;
 use Composer\EventDispatcher\EventDispatcher;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
-use GuzzleHttp\Client;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class Handler {
