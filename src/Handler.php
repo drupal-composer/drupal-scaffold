@@ -309,6 +309,7 @@ EOF;
       '.eslintrc',
       '.gitattributes',
       '.htaccess',
+      'index.php',
       'robots.txt',
       'sites/default/default.settings.php',
       'sites/default/default.services.yml',
