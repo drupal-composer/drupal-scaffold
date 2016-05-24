@@ -7,7 +7,9 @@
 
 namespace DrupalComposer\DrupalScaffold\Tests;
 
+use Composer\IO\NullIO;
 use Composer\Util\Filesystem;
+use Composer\Util\RemoteFilesystem;
 use DrupalComposer\DrupalScaffold\FileFetcher;
 use GuzzleHttp\Client;
 
@@ -60,8 +62,10 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testFetch() {
-    $fetcher = new FileFetcher(new Client(), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', ['.htaccess', 'sites/default/default.settings.php']);
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', ['.htaccess', 'sites/default/default.settings.php']);
     $fetcher->fetch('8.1.1', $this->tmpDir);
+    $this->assertFileExists($this->tmpDir . '/.htaccess');
+    $this->assertFileExists($this->tmpDir . '/sites/default/default.settings.php');
   }
-  
+
 }

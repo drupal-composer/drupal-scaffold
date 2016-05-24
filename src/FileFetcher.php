@@ -15,12 +15,13 @@ use Psr\Http\Message\ResponseInterface;
 
 class FileFetcher {
 
-  protected $client;
+  /**
+   * @var \Composer\Util\RemoteFilesystem
+   */
+  protected $remoteFilesystem;
 
-  protected $template;
-
-  public function __construct(RemoteFilesystem $client, $source, $filenames = []) {
-    $this->client = $client;
+  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = []) {
+    $this->remoteFilesystem = $remoteFilesystem;
     $this->source = $source;
     $this->filenames = $filenames;
     $this->fs = new Filesystem();
@@ -30,19 +31,8 @@ class FileFetcher {
     array_walk($this->filenames, function ($filename) use ($version, $destination) {
       $url = $this->getUri($filename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      $this->client->copy($url, $url, $destination . '/' . $filename);
+      $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename);
     });
-    /*
-    $promises = array_map(function ($filename) use ($version) {
-      return $this->client->getAsync($this->getUri($filename, $version));
-    }, array_combine($this->filenames, $this->filenames));
-
-    $results = Promise\unwrap($promises);
-    array_walk($results, function (ResponseInterface $response, $filename) use ($destination) {
-      $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      file_put_contents($filename, $response->getBody()->getContents());
-    });
-    */
   }
 
   protected function getUri($filename, $version) {
