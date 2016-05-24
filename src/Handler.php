@@ -180,9 +180,7 @@ EOF;
     $config = $this->composer->getConfig();
     $filesystem = new Filesystem();
     $filesystem->ensureDirectoryExists($config->get('vendor-dir'));
-    $basePath = $filesystem->normalizePath(realpath(getcwd()));
     $vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
-
     return $vendorPath;
   }
 
@@ -197,19 +195,6 @@ EOF;
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
-  }
-
-  /**
-   * Helper to get the robo executable.
-   *
-   * @return string
-   *   The absolute path for the drush directory.
-   */
-  public function getRoboExecutable() {
-    $package = $this->getPackage('codegyre/Robo');
-    if ($package) {
-      return $this->composer->getInstallationManager()->getInstallPath($package) . '/robo';
-    }
   }
 
   /**
