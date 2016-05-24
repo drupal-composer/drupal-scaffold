@@ -66,9 +66,10 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    * Tests a simple composer install without core, but adding core later.
    */
   public function testComposerInstallAndUpdate() {
+    $exampleScaffoldFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'index.php';
+    $this->assertFileNotExists($exampleScaffoldFile, 'Scaffold file should not exist prior to our first run of composer install.');
     $this->composer('install');
     $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . 'core', 'Drupal core is installed.');
-    $exampleScaffoldFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'index.php';
     $this->assertFileNotExists($exampleScaffoldFile, 'Scaffold file should not be automatically installed.');
     $this->composer('drupal-scaffold');
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be installed by "drupal-scaffold" command.');
