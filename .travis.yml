@@ -6,6 +6,9 @@ php:
 
 sudo: false
 
+git:
+ depth: 10000
+
 before_install:
   - phpenv config-rm xdebug.ini
   - composer --verbose self-update
@@ -17,7 +20,6 @@ install:
 before_script:
   - git config --global user.email "travisci@example.com"
   - git config --global user.name "Travis CI Test"
-  - git fetch --unshallow
 
 script:
   - ./vendor/bin/phpunit
