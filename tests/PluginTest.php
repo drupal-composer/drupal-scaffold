@@ -82,7 +82,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
       touch($exampleScaffoldFile);
       $mtime_touched = filemtime($exampleScaffoldFile);
       // Requiring a newer version triggers "composer update"
-      $this->composer('require --update-with-dependencies drupal/core:"' . $version .'"@dev');
+      $this->composer('require --update-with-dependencies drupal/core:"' . $version .'"');
       clearstatcache();
       $mtime_after = filemtime($exampleScaffoldFile);
       $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update. (' . $version . ')');
