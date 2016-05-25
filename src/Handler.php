@@ -109,8 +109,13 @@ class Handler {
     $dispatcher = new EventDispatcher($this->composer, $this->io);
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
+    $version = $drupalCorePackage->getPrettyVersion();
+    if ($drupalCorePackage->getStability() == 'dev' && substr($version, -4) == '-dev') {
+      $version = substr($version, 0, -4);
+    }
+
     $fetcher = new FileFetcher(new RemoteFilesystem($this->io), $options['source'], $files);
-    $fetcher->fetch($drupalCorePackage->getPrettyVersion(), $webroot);
+    $fetcher->fetch($version, $webroot);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
