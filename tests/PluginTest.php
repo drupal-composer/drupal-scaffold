@@ -76,15 +76,17 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     $this->composer('drupal-scaffold');
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be installed by "drupal-scaffold" command.');
 
-    // We touch a scaffold file, so we can check the file was modified after
-    // the scaffold update.
-    touch($exampleScaffoldFile);
-    $mtime_touched = filemtime($exampleScaffoldFile);
-    // Requiring a newer version triggers "composer update"
-    $this->composer('require drupal/core:"8.0.1"');
-    clearstatcache();
-    $mtime_after = filemtime($exampleScaffoldFile);
-    $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update.');
+    foreach (['8.0.1', 'dev-8.1.x', '8.1.x-dev'] as $version) {
+      // We touch a scaffold file, so we can check the file was modified after
+      // the scaffold update.
+      touch($exampleScaffoldFile);
+      $mtime_touched = filemtime($exampleScaffoldFile);
+      // Requiring a newer version triggers "composer update"
+      $this->composer('require --update-with-dependencies drupal/core:"' . $version .'"');
+      clearstatcache();
+      $mtime_after = filemtime($exampleScaffoldFile);
+      $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update. (' . $version . ')');
+    }
 
     // We touch a scaffold file, so we can check the file was modified after
     // the custom commandscaffold update.
@@ -149,7 +151,10 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    */
   protected function composer($command) {
     chdir($this->tmpDir);
-    passthru(escapeshellcmd($this->rootDir . '/vendor/bin/composer ' . $command));
+    passthru(escapeshellcmd($this->rootDir . '/vendor/bin/composer ' . $command), $exit_code);
+    if ($exit_code !== 0) {
+      throw new \Exception('Composer returned a non-zero exit code');
+    }
   }
 
   /**
@@ -160,7 +165,10 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    */
   protected function git($command) {
     chdir($this->rootDir);
-    passthru(escapeshellcmd('git ' . $command));
+    passthru(escapeshellcmd('git ' . $command), $exit_code);
+    if ($exit_code !== 0) {
+      throw new \Exception('Git returned a non-zero exit code');
+    }
   }
 
   /**
