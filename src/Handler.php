@@ -103,20 +103,19 @@ class Handler {
 
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
-    $excludes = $this->getExcludes();
-    $includes = $this->getIncludes();
+    $files = array_diff($this->getIncludes(), $this->getExcludes());
 
     // Call any pre-scaffold scripts that may be defined.
     $dispatcher = new EventDispatcher($this->composer, $this->io);
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
-    $fetcher = new FileFetcher(new RemoteFilesystem($this->io), $options['source'], $includes);
+    $fetcher = new FileFetcher(new RemoteFilesystem($this->io), $options['source'], $files);
     $fetcher->fetch($drupalCorePackage->getPrettyVersion(), $webroot);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
   }
-  
+
   /**
    * Generate the autoload file at the project root.  Include the
    * autoload file that Composer generated.
