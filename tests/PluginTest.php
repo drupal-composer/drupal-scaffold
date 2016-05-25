@@ -76,13 +76,13 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     $this->composer('drupal-scaffold');
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be installed by "drupal-scaffold" command.');
 
-    foreach (['8.0.1', 'dev-8.1.x', '8.1.x-dev'] as $version) {
+    foreach (['8.0.1', '8.1.x-dev'] as $version) {
       // We touch a scaffold file, so we can check the file was modified after
       // the scaffold update.
       touch($exampleScaffoldFile);
       $mtime_touched = filemtime($exampleScaffoldFile);
       // Requiring a newer version triggers "composer update"
-      $this->composer('require --update-with-dependencies drupal/core:"' . $version .'"');
+      $this->composer('require --update-with-dependencies drupal/core:"' . $version .'"@dev');
       clearstatcache();
       $mtime_after = filemtime($exampleScaffoldFile);
       $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update. (' . $version . ')');
