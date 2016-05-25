@@ -13,8 +13,8 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\EventDispatcher\EventDispatcher;
-
 use Composer\Util\Filesystem;
+use Composer\Util\RemoteFilesystem;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class Handler {
@@ -99,59 +99,21 @@ class Handler {
    */
   public function downloadScaffold() {
     $drupalCorePackage = $this->getDrupalCorePackage();
-    $webroot = $this->getWebRoot();
+    $webroot = realpath($this->getWebRoot());
 
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
-    $excludes = $this->getExcludes();
-    $includes = $this->getIncludes();
+    $files = array_diff($this->getIncludes(), $this->getExcludes());
 
     // Call any pre-scaffold scripts that may be defined.
     $dispatcher = new EventDispatcher($this->composer, $this->io);
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
-    // Run Robo
-    $robo = new RoboRunner();
-    $robo->execute(
-      [
-        'robo',
-        'drupal_scaffold:download',
-        $drupalCorePackage->getPrettyVersion(),
-        '--source',
-        $options['source'],
-        '--webroot',
-        realpath($webroot),
-        '--excludes',
-        static::array_to_csv($excludes),
-        '--includes',
-        static::array_to_csv($includes),
-      ]
-    );
+    $fetcher = new FileFetcher(new RemoteFilesystem($this->io), $options['source'], $files);
+    $fetcher->fetch($drupalCorePackage->getPrettyVersion(), $webroot);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
-  }
-
-  /**
-   * Execute the specified command and args in a subprocess.
-   */
-  public static function execute($args) {
-    $command = implode(" ", array_map('escapeshellarg', $args));
-    passthru($command);
-  }
-
-  /**
-   * Convert an array into a comma-separated-value string.
-   * Items remain unchanged unless they need to be escaped.
-   *
-   * Compliment of str_getcsv().
-   */
-  public static function array_to_csv($data, $delimiter = ',', $enclosure = '"', $escape = '\\') {
-    return implode(',', array_map(function ($item) use($delimiter, $enclosure, $escape) {
-      $has_delimiter = (strpos($item, $delimiter) !== FALSE);
-      $escaped_item = str_replace([$enclosure, $escape], ["{$escape}{$enclosure}", "{$escape}{$escape}"], $item);
-      return ($has_delimiter || ($item == $escaped_item)) ? $item : "{$escape}{$escaped_item}{$escape}";
-    }, $data));
   }
 
   /**
@@ -209,7 +171,6 @@ EOF;
     $config = $this->composer->getConfig();
     $filesystem = new Filesystem();
     $filesystem->ensureDirectoryExists($config->get('vendor-dir'));
-    $basePath = $filesystem->normalizePath(realpath(getcwd()));
     $vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
 
     return $vendorPath;
@@ -226,19 +187,6 @@ EOF;
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
-  }
-
-  /**
-   * Helper to get the robo executable.
-   *
-   * @return string
-   *   The absolute path for the drush directory.
-   */
-  public function getRoboExecutable() {
-    $package = $this->getPackage('codegyre/Robo');
-    if ($package) {
-      return $this->composer->getInstallationManager()->getInstallPath($package) . '/robo';
-    }
   }
 
   /**
@@ -315,7 +263,8 @@ EOF;
       'omit-defaults' => FALSE,
       'excludes' => [],
       'includes' => [],
-      'source' => 'https://ftp.drupal.org/files/projects/drupal-{version}.tar.gz',
+      'source' => 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
+      // Github: https://raw.githubusercontent.com/drupal/drupal/{version}/{path}
     ];
     return $options;
   }
@@ -324,23 +273,7 @@ EOF;
    * Holds default excludes.
    */
   protected function getExcludesDefault() {
-    return [
-      '.gitkeep',
-      'autoload.php',
-      'composer.json',
-      'composer.lock',
-      'core',
-      'drush',
-      'example.gitignore',
-      'LICENSE.txt',
-      'README.txt',
-      'vendor',
-      'themes',
-      'profiles',
-      'modules',
-      'sites/*',
-      'sites/default/*'
-    ];
+    return [];
   }
 
   /**
@@ -348,13 +281,22 @@ EOF;
    */
   protected function getIncludesDefault() {
     return [
-      'sites',
-      'sites/default',
+      '.csslintrc',
+      '.editorconfig',
+      '.eslintignore',
+      '.eslintrc',
+      '.gitattributes',
+      '.htaccess',
+      'index.php',
+      'robots.txt',
       'sites/default/default.settings.php',
       'sites/default/default.services.yml',
       'sites/development.services.yml',
       'sites/example.settings.local.php',
-      'sites/example.sites.php'
+      'sites/example.sites.php',
+      'update.php',
+      'web.config'
     ];
   }
+
 }

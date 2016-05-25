@@ -5,12 +5,7 @@
     "license": "GPL-2.0+",
     "require": {
         "php": ">=5.4.5",
-        "composer-plugin-api": "^1.0.0",
-        "guzzlehttp/guzzle": "~6.1",
-        "codegyre/robo": "^0.7.1",
-        "pear/archive_tar": "~1.0",
-        "ext-curl": "*",
-        "ext-zlib": "*"
+        "composer-plugin-api": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -20,7 +15,7 @@
     "extra": {
         "class": "DrupalComposer\\DrupalScaffold\\Plugin",
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "2.0.x-dev"
         }
     },
     "require-dev": {
