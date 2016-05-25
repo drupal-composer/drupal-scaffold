@@ -116,15 +116,7 @@ class Handler {
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
   }
-
-  /**
-   * Execute the specified command and args in a subprocess.
-   */
-  public static function execute($args) {
-    $command = implode(" ", array_map('escapeshellarg', $args));
-    passthru($command);
-  }
-
+  
   /**
    * Generate the autoload file at the project root.  Include the
    * autoload file that Composer generated.
@@ -181,6 +173,7 @@ EOF;
     $filesystem = new Filesystem();
     $filesystem->ensureDirectoryExists($config->get('vendor-dir'));
     $vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
+
     return $vendorPath;
   }
 
@@ -232,6 +225,7 @@ EOF;
   protected function getExcludes() {
     return $this->getNamedOptionList('excludes', 'getExcludesDefault');
   }
+
   /**
    * Retrieve list of additional settings files from optional "extra" configuration.
    *
