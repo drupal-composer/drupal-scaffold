@@ -1,5 +1,7 @@
 # drupal-scaffold
 
+[![Build Status](https://travis-ci.org/drupal-composer/drupal-scaffold.svg?branch=master)](https://travis-ci.org/drupal-composer/drupal-scaffold)
+
 Composer plugin for automatically downloading Drupal scaffold files (like
 `index.php`, `update.php`, …) when using `drupal/core` via Composer.
 
