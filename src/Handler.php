@@ -114,8 +114,13 @@ class Handler {
       $version = substr($version, 0, -4);
     }
 
-    $fetcher = new FileFetcher(new RemoteFilesystem($this->io), $options['source'], $files);
+    $remoteFs = new RemoteFilesystem($this->io);
+
+    $fetcher = new FileFetcher($remoteFs, $options['source'], $files);
     $fetcher->fetch($version, $webroot);
+
+    $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial());
+    $initialFileFetcher->fetch($version, $webroot);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
@@ -240,6 +245,15 @@ EOF;
   }
 
   /**
+   * Retrieve list of initial files from optional "extra" configuration.
+   *
+   * @return array
+   */
+  protected function getInitial() {
+    return $this->getNamedOptionList('initial', 'getInitialDefault');
+  }
+
+  /**
    * Retrieve a named list of options from optional "extra" configuration.
    * Respects 'omit-defaults', and either includes or does not include the
    * default values, as requested.
@@ -268,6 +282,7 @@ EOF;
       'omit-defaults' => FALSE,
       'excludes' => [],
       'includes' => [],
+      'initial' => [],
       'source' => 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
       // Github: https://raw.githubusercontent.com/drupal/drupal/{version}/{path}
     ];
@@ -302,6 +317,13 @@ EOF;
       'update.php',
       'web.config'
     ];
+  }
+
+  /**
+   * Holds default initial files.
+   */
+  protected function getInitialDefault() {
+    return [];
   }
 
 }
