@@ -17,6 +17,10 @@ class FileFetcher {
    */
   protected $remoteFilesystem;
 
+  protected $source;
+  protected $filenames;
+  protected $fs;
+
   public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = []) {
     $this->remoteFilesystem = $remoteFilesystem;
     $this->source = $source;
