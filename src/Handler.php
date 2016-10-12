@@ -73,7 +73,7 @@ class Handler {
   public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
     $package = $this->getCorePackage($event->getOperation());
     if ($package) {
-      // By explicitiley setting the core package, the onPostCmdEvent() will
+      // By explicitly setting the core package, the onPostCmdEvent() will
       // process the scaffolding automatically.
       $this->drupalCorePackage = $package;
     }
