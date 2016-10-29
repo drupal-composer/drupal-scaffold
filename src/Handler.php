@@ -301,11 +301,10 @@ EOF;
    * Holds default settings files list.
    */
   protected function getIncludesDefault() {
-    return [
+    $common = [
       '.csslintrc',
       '.editorconfig',
       '.eslintignore',
-      '.eslintrc',
       '.gitattributes',
       '.htaccess',
       'index.php',
@@ -318,6 +317,17 @@ EOF;
       'update.php',
       'web.config'
     ];
+
+    list($major, $minor) =  explode('.', \Drupal::VERSION, 3);
+    switch ("$major.$minor") {
+      case '8.3':
+        $addition = ['.eslintrc.json'];
+        break;
+      default:
+        $addition = ['.eslintrc'];
+    }
+
+    return array_merge($common, $addition);
   }
 
   /**
