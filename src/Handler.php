@@ -301,11 +301,20 @@ EOF;
    * Holds default settings files list.
    */
   protected function getIncludesDefault() {
-    return [
+    $requires = $this->composer->getPackage()->getRequires();
+    if (isset($requires['drupal/core'])) {
+      list($major, $minor) = explode('.', $requires['drupal/core']->getPrettyConstraint(), 3);
+      $version = "$major.$minor";
+    }
+    else {
+      // Unknown Drupal version.
+      $version = NULL;
+    }
+
+    $common = [
       '.csslintrc',
       '.editorconfig',
       '.eslintignore',
-      '.eslintrc',
       '.gitattributes',
       '.htaccess',
       'index.php',
@@ -318,6 +327,17 @@ EOF;
       'update.php',
       'web.config'
     ];
+
+    // Version specific variations.
+    switch ($version) {
+      case '8.3':
+        $addition = ['.eslintrc.json'];
+        break;
+      default:
+        $addition = ['.eslintrc'];
+    }
+
+    return array_merge($common, $addition);
   }
 
   /**
