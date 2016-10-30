@@ -86,6 +86,7 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
 
     $this->setExpectedException(TransportException::class);
     $fetcher->fetch('8.3.x', $this->tmpDir);
+
     $this->assertFileExists($this->tmpDir . '/.eslintrc.json');
     $this->assertFileNotExists($this->tmpDir . '/.eslintrc');
   }
