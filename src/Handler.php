@@ -200,7 +200,7 @@ EOF;
   /**
    * Returns the Drupal core version for the given package.
    *
-   * @param $drupalCorePackage
+   * @param \Composer\Package\PackageInterface $drupalCorePackage
    *
    * @return string
    */
