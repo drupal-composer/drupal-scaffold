@@ -109,10 +109,7 @@ class Handler {
     $dispatcher = new EventDispatcher($this->composer, $this->io);
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
-    $version = $drupalCorePackage->getPrettyVersion();
-    if ($drupalCorePackage->getStability() == 'dev' && substr($version, -4) == '-dev') {
-      $version = substr($version, 0, -4);
-    }
+    $version = $this->getDrupalCoreVersion($drupalCorePackage);
 
     $remoteFs = new RemoteFilesystem($this->io);
 
@@ -198,6 +195,22 @@ EOF;
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
+  }
+
+  /**
+   * Returns the Drupal core version for the given package.
+   *
+   * @param $drupalCorePackage
+   *
+   * @return string
+   */
+  protected function getDrupalCoreVersion(PackageInterface $drupalCorePackage) {
+    $version = $drupalCorePackage->getPrettyVersion();
+    if ($drupalCorePackage->getStability() == 'dev' && substr($version, -4) == '-dev') {
+      $version = substr($version, 0, -4);
+      return $version;
+    }
+    return $version;
   }
 
   /**
@@ -301,19 +314,20 @@ EOF;
    * Holds default settings files list.
    */
   protected function getIncludesDefault() {
-    if ($core = $this->getDrupalCorePackage()) {
-      list($major, $minor) = explode('.', $core->getPrettyVersion(), 3);
-      $version = "$major.$minor";
-    }
-    else {
-      // Unknown Drupal version.
-      $version = NULL;
-    }
+    $version = $this->getDrupalCoreVersion($this->getDrupalCorePackage());
+    list($major, $minor) = explode('.', $version, 3);
+    $version = "$major.$minor";
 
+    /**
+     * Files from 8.3.x
+     *
+     * @see http://cgit.drupalcode.org/drupal/tree/?h=8.3.x
+     */
     $common = [
       '.csslintrc',
       '.editorconfig',
       '.eslintignore',
+      '.eslintrc.json',
       '.gitattributes',
       '.htaccess',
       'index.php',
@@ -329,14 +343,16 @@ EOF;
 
     // Version specific variations.
     switch ($version) {
-      case '8.3':
-        $addition = ['.eslintrc.json'];
+      case '8.0':
+      case '8.1':
+      case '8.2':
+        $common[] = '.eslintrc';
+        $common = array_diff($common, ['.eslintrc.json']);
         break;
-      default:
-        $addition = ['.eslintrc'];
     }
 
-    return array_merge($common, $addition);
+    sort($common);
+    return $common;
   }
 
   /**
