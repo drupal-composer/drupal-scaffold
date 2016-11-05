@@ -109,10 +109,7 @@ class Handler {
     $dispatcher = new EventDispatcher($this->composer, $this->io);
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
-    $version = $drupalCorePackage->getPrettyVersion();
-    if ($drupalCorePackage->getStability() == 'dev' && substr($version, -4) == '-dev') {
-      $version = substr($version, 0, -4);
-    }
+    $version = $this->getDrupalCoreVersion($drupalCorePackage);
 
     $remoteFs = new RemoteFilesystem($this->io);
 
@@ -198,6 +195,22 @@ EOF;
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
+  }
+
+  /**
+   * Returns the Drupal core version for the given package.
+   *
+   * @param \Composer\Package\PackageInterface $drupalCorePackage
+   *
+   * @return string
+   */
+  protected function getDrupalCoreVersion(PackageInterface $drupalCorePackage) {
+    $version = $drupalCorePackage->getPrettyVersion();
+    if ($drupalCorePackage->getStability() == 'dev' && substr($version, -4) == '-dev') {
+      $version = substr($version, 0, -4);
+      return $version;
+    }
+    return $version;
   }
 
   /**
@@ -301,11 +314,20 @@ EOF;
    * Holds default settings files list.
    */
   protected function getIncludesDefault() {
-    return [
+    $version = $this->getDrupalCoreVersion($this->getDrupalCorePackage());
+    list($major, $minor) = explode('.', $version, 3);
+    $version = "$major.$minor";
+
+    /**
+     * Files from 8.3.x
+     *
+     * @see http://cgit.drupalcode.org/drupal/tree/?h=8.3.x
+     */
+    $common = [
       '.csslintrc',
       '.editorconfig',
       '.eslintignore',
-      '.eslintrc',
+      '.eslintrc.json',
       '.gitattributes',
       '.htaccess',
       'index.php',
@@ -318,6 +340,19 @@ EOF;
       'update.php',
       'web.config'
     ];
+
+    // Version specific variations.
+    switch ($version) {
+      case '8.0':
+      case '8.1':
+      case '8.2':
+        $common[] = '.eslintrc';
+        $common = array_diff($common, ['.eslintrc.json']);
+        break;
+    }
+
+    sort($common);
+    return $common;
   }
 
   /**

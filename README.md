@@ -61,7 +61,8 @@ Default includes are provided by the plugin:
 .csslintrc
 .editorconfig
 .eslintignore
-.eslintrc
+.eslintrc (Drupal <= 8.2.x)
+.eslintrc.json (Drupal >= 8.3.x)
 .gitattributes
 .htaccess
 index.php
