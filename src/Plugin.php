@@ -74,8 +74,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    */
   public static function scaffold(\Composer\Script\Event $event) {
     $handler = new Handler($event->getComposer(), $event->getIO());
-    $handler->downloadScaffold();
-    // Generate the autoload.php file after generating the scaffold files.
-    $handler->generateAutoload();
+    if ($handler->getDrupalCorePackage()) {
+      $handler->downloadScaffold();
+      // Generate the autoload.php file after generating the scaffold files.
+      $handler->generateAutoload();
+    }
   }
 }
