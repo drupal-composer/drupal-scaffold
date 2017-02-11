@@ -38,6 +38,9 @@ of your root `composer.json`.
       "includes": [
         "sites/default/example.settings.my.php"
       ],
+      "dev": [
+        "my_settings_file_for_development.php"
+      ],
       "initial": {
         "sites/default/default.services.yml": "sites/default/services.yml",
         "sites/default/default.settings.php": "sites/default/settings.php"
@@ -58,6 +61,19 @@ default.
 
 Default includes are provided by the plugin:
 ```
+.htaccess
+index.php
+robots.txt
+sites/default/default.settings.php
+sites/default/default.services.yml
+sites/example.settings.local.php
+sites/example.sites.php
+update.php
+web.config
+```
+
+Default dev are provided by the plugin:
+```
 .csslintrc
 .editorconfig
 .eslintignore
@@ -65,16 +81,7 @@ Default includes are provided by the plugin:
 .eslintrc.json (Drupal >= 8.3.x)
 .gitattributes
 .ht.router.php (Drupal >= 8.5.x)
-.htaccess
-index.php
-robots.txt
-sites/default/default.settings.php
-sites/default/default.services.yml
 sites/development.services.yml
-sites/example.settings.local.php
-sites/example.sites.php
-update.php
-web.config
 ```
 
 When setting `omit-defaults` to `true`, neither the default excludes nor the
@@ -86,6 +93,9 @@ or `includes` will be in addition to the usual defaults.
 The `initial` hash lists files that should be copied over only if they do not
 exist in the destination. The key specifies the path to the source file, and
 the value indicates the path to the destination file.
+
+The `dev` hash lists files that should be copied over only if they do not
+exist in the destination and if the dev packages are installed.
 
 ## Limitation
 

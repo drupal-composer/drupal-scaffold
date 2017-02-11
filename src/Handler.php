@@ -133,7 +133,7 @@ class Handler {
     // Only install the scaffolding if drupal/core was installed,
     // AND there are no scaffolding files present.
     if (isset($this->drupalCorePackage)) {
-      $this->downloadScaffold();
+      $this->downloadScaffold($event->isDevMode());
       // Generate the autoload.php file after generating the scaffold files.
       $this->generateAutoload();
     }
@@ -141,14 +141,22 @@ class Handler {
 
   /**
    * Downloads drupal scaffold files for the current process.
+   *
+   * @param bool $dev
+   *   TRUE if dev packages are installed. FALSE otherwise.
    */
-  public function downloadScaffold() {
+  public function downloadScaffold($dev = FALSE) {
     $drupalCorePackage = $this->getDrupalCorePackage();
     $webroot = realpath($this->getWebRoot());
 
-    // Collect options, excludes and settings files.
+    // Collect options, excludes, dev and settings files.
     $options = $this->getOptions();
-    $files = array_diff($this->getIncludes(), $this->getExcludes());
+    $includes = $this->getIncludes();
+    // Check dev files if necessary.
+    if ($dev) {
+      $includes = array_merge($includes, $this->getDev());
+    }
+    $files = array_diff($includes, $this->getExcludes());
 
     // Call any pre-scaffold scripts that may be defined.
     $dispatcher = new EventDispatcher($this->composer, $this->io);
@@ -305,6 +313,15 @@ EOF;
   }
 
   /**
+   * Retrieve list of additional dev files from optional "extra" configuration.
+   *
+   * @return array
+   */
+  protected function getDev() {
+    return $this->getNamedOptionList('dev', 'getDevDefault');
+  }
+
+  /**
    * Retrieve list of initial files from optional "extra" configuration.
    *
    * @return array
@@ -343,6 +360,7 @@ EOF;
       'excludes' => [],
       'includes' => [],
       'initial' => [],
+      'dev' => [],
       'source' => 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
       // Github: https://raw.githubusercontent.com/drupal/drupal/{version}/{path}
     ];
@@ -360,6 +378,30 @@ EOF;
    * Holds default settings files list.
    */
   protected function getIncludesDefault() {
+    /**
+     * Files from 8.3.x
+     *
+     * @see https://cgit.drupalcode.org/drupal/tree/?h=8.3.x
+     */
+    $common = [
+      '.htaccess',
+      'index.php',
+      'robots.txt',
+      'sites/default/default.settings.php',
+      'sites/default/default.services.yml',
+      'sites/example.settings.local.php',
+      'sites/example.sites.php',
+      'update.php',
+      'web.config',
+    ];
+
+    return $common;
+  }
+
+  /**
+   * Holds default dev files list.
+   */
+  protected function getDevDefault() {
     $version = $this->getDrupalCoreVersion($this->getDrupalCorePackage());
     list($major, $minor) = explode('.', $version, 3);
     $version = "$major.$minor";
@@ -367,23 +409,15 @@ EOF;
     /**
      * Files from 8.3.x
      *
-     * @see https://cgit.drupalcode.org/drupal/tree/?h=8.3.x
+     * @see http://cgit.drupalcode.org/drupal/tree/?h=8.3.x
      */
     $common = [
       '.csslintrc',
       '.editorconfig',
       '.eslintignore',
+      '.eslintrc.json',
       '.gitattributes',
-      '.htaccess',
-      'index.php',
-      'robots.txt',
-      'sites/default/default.settings.php',
-      'sites/default/default.services.yml',
       'sites/development.services.yml',
-      'sites/example.settings.local.php',
-      'sites/example.sites.php',
-      'update.php',
-      'web.config',
     ];
 
     // Version specific variations.
