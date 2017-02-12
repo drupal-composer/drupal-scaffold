@@ -38,7 +38,7 @@ of your root `composer.json`.
       "includes": [
         "sites/default/example.settings.my.php"
       ],
-      "dev": [
+      "includes-dev": [
         "my_settings_file_for_development.php"
       ],
       "initial": {
@@ -72,7 +72,7 @@ update.php
 web.config
 ```
 
-Default dev are provided by the plugin:
+Default includes dev are provided by the plugin:
 ```
 .csslintrc
 .editorconfig
@@ -94,7 +94,7 @@ The `initial` hash lists files that should be copied over only if they do not
 exist in the destination. The key specifies the path to the source file, and
 the value indicates the path to the destination file.
 
-The `dev` hash lists files that should be copied over only if they do not
+The `includes-dev` hash lists files that should be copied over only if they do not
 exist in the destination and if the dev packages are installed.
 
 ## Limitation
