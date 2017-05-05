@@ -10,9 +10,9 @@ namespace DrupalComposer\DrupalScaffold;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
+use Composer\EventDispatcher\EventDispatcher;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
-use Composer\EventDispatcher\EventDispatcher;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
@@ -113,7 +113,7 @@ class Handler {
 
     $remoteFs = new RemoteFilesystem($this->io);
 
-    $fetcher = new FileFetcher($remoteFs, $options['source'], $files);
+    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $files, $this->io, $this->composer->getConfig());
     $fetcher->fetch($version, $webroot);
 
     $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial());

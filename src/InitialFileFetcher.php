@@ -7,10 +7,8 @@
 
 namespace DrupalComposer\DrupalScaffold;
 
-use Composer\Util\Filesystem;
-use Composer\Util\RemoteFilesystem;
-
 class InitialFileFetcher extends FileFetcher {
+
   public function fetch($version, $destination) {
     array_walk($this->filenames, function ($filename, $sourceFilename) use ($version, $destination) {
       $target = "$destination/$filename";
@@ -21,4 +19,5 @@ class InitialFileFetcher extends FileFetcher {
       }
     });
   }
+
 }
