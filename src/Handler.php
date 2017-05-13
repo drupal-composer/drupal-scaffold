@@ -15,6 +15,7 @@ use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
+use Composer\Script\Event;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class Handler {
@@ -23,17 +24,17 @@ class Handler {
   const POST_DRUPAL_SCAFFOLD_CMD = 'post-drupal-scaffold-cmd';
 
   /**
-   * @var \Composer\Composer
+   * @var Composer
    */
   protected $composer;
 
   /**
-   * @var \Composer\IO\IOInterface
+   * @var IOInterface
    */
   protected $io;
 
   /**
-   * @var \Composer\Package\PackageInterface
+   * @var PackageInterface
    */
   protected $drupalCorePackage;
 
@@ -53,16 +54,14 @@ class Handler {
    * @return mixed
    */
   protected function getCorePackage($operation) {
+    $package = null;
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
     }
     elseif ($operation instanceof UpdateOperation) {
       $package = $operation->getTargetPackage();
     }
-    if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'drupal/core') {
-      return $package;
-    }
-    return NULL;
+    return $package;
   }
 
   /**
@@ -82,12 +81,13 @@ class Handler {
   /**
    * Post install command event to execute the scaffolding.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
+   * @throws \Symfony\Component\Filesystem\Exception\IOException
    */
-  public function onPostCmdEvent(\Composer\Script\Event $event) {
+  public function onPostCmdEvent(Event $event) {
     // Only install the scaffolding if drupal/core was installed,
     // AND there are no scaffolding files present.
-    if (isset($this->drupalCorePackage)) {
+    if (null !== $this->drupalCorePackage) {
       $this->downloadScaffold();
       // Generate the autoload.php file after generating the scaffold files.
       $this->generateAutoload();
@@ -113,7 +113,13 @@ class Handler {
 
     $remoteFs = new RemoteFilesystem($this->io);
 
-    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $files, $this->io, $this->composer->getConfig());
+    $fetcher = new PrestissimoFileFetcher(
+      $remoteFs,
+      $options['source'],
+      $files,
+      $this->io,
+      $this->composer->getConfig()
+    );
     $fetcher->fetch($version, $webroot);
 
     $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial());
@@ -123,10 +129,11 @@ class Handler {
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
   }
 
-  /**
-   * Generate the autoload file at the project root.  Include the
-   * autoload file that Composer generated.
-   */
+    /**
+     * Generate the autoload file at the project root.  Include the
+     * autoload file that Composer generated.
+     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     */
   public function generateAutoload() {
     $vendorPath = $this->getVendorPath();
     $webroot = $this->getWebRoot();
@@ -136,7 +143,7 @@ class Handler {
     $fs = new SymfonyFilesystem();
     $relativeVendorPath = $fs->makePathRelative($vendorPath, realpath($webroot));
 
-    $fs->dumpFile($webroot . "/autoload.php", $this->autoLoadContents($relativeVendorPath));
+    $fs->dumpFile($webroot . '/autoload.php', $this->autoLoadContents($relativeVendorPath));
   }
 
   /**
@@ -191,7 +198,7 @@ EOF;
    * @return PackageInterface
    */
   public function getDrupalCorePackage() {
-    if (!isset($this->drupalCorePackage)) {
+    if (null === $this->drupalCorePackage) {
       $this->drupalCorePackage = $this->getPackage('drupal/core');
     }
     return $this->drupalCorePackage;
@@ -200,7 +207,7 @@ EOF;
   /**
    * Returns the Drupal core version for the given package.
    *
-   * @param \Composer\Package\PackageInterface $drupalCorePackage
+   * @param PackageInterface $drupalCorePackage
    *
    * @return string
    */
@@ -276,7 +283,7 @@ EOF;
    */
   protected function getNamedOptionList($optionName, $defaultFn) {
     $options = $this->getOptions($this->composer);
-    $result = array();
+    $result = [];
     if (empty($options['omit-defaults'])) {
       $result = $this->$defaultFn();
     }

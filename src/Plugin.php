@@ -13,6 +13,7 @@ use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
+use Composer\Script\Event;
 
 /**
  * Composer plugin for handling drupal scaffold.
@@ -20,7 +21,7 @@ use Composer\Script\ScriptEvents;
 class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
-   * @var \DrupalComposer\DrupalScaffold\Handler
+   * @var Handler
    */
   protected $handler;
 
@@ -51,7 +52,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Post package event behaviour.
    *
-   * @param \Composer\Installer\PackageEvent $event
+   * @param PackageEvent $event
    */
   public function postPackage(PackageEvent $event) {
     $this->handler->onPostPackageEvent($event);
@@ -60,9 +61,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Post command event callback.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
    */
-  public function postCmd(\Composer\Script\Event $event) {
+  public function postCmd(Event $event) {
     $this->handler->onPostCmdEvent($event);
   }
 
@@ -70,9 +71,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * Script callback for putting in composer scripts to download the
    * scaffold files.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
    */
-  public static function scaffold(\Composer\Script\Event $event) {
+  public static function scaffold(Event $event) {
     $handler = new Handler($event->getComposer(), $event->getIO());
     $handler->downloadScaffold();
     // Generate the autoload.php file after generating the scaffold files.

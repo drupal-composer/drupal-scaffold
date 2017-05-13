@@ -8,7 +8,10 @@
 namespace DrupalComposer\DrupalScaffold;
 
 class InitialFileFetcher extends FileFetcher {
-
+  /**
+   * @param $version
+   * @param $destination
+   */
   public function fetch($version, $destination) {
     array_walk($this->filenames, function ($filename, $sourceFilename) use ($version, $destination) {
       $target = "$destination/$filename";

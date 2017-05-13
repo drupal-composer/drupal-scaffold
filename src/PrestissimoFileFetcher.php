@@ -13,23 +13,39 @@ use Hirak\Prestissimo\CopyRequest;
 use Hirak\Prestissimo\CurlMulti;
 
 class PrestissimoFileFetcher extends FileFetcher {
-
   /**
-   * @var \Composer\IO\IOInterface
+   * @var IOInterface
    */
   protected $io;
-
   /**
-   * @var \Composer\Config
+   * @var Config
    */
   protected $config;
 
-  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, array $filenames = [], IOInterface $io, Config $config) {
+  /**
+   * PrestissimoFileFetcher constructor.
+   * @param \Composer\Util\RemoteFilesystem $remoteFilesystem
+   * @param $source
+   * @param array $filenames
+   * @param IOInterface $io
+   * @param Config $config
+   */
+  public function __construct(
+    \Composer\Util\RemoteFilesystem $remoteFilesystem,
+    $source,
+    array $filenames = [],
+    IOInterface $io,
+    Config $config
+    ) {
     parent::__construct($remoteFilesystem, $source, $filenames);
     $this->io = $io;
     $this->config = $config;
   }
 
+  /**
+   * @param $version
+   * @param $destination
+   */
   public function fetch($version, $destination) {
     if (class_exists(CurlMulti::class)) {
       $this->fetchWithPrestissimo($version, $destination);
@@ -38,6 +54,10 @@ class PrestissimoFileFetcher extends FileFetcher {
     parent::fetch($version, $destination);
   }
 
+  /**
+   * @param $version
+   * @param $destination
+   */
   protected function fetchWithPrestissimo($version, $destination) {
     $requests = [];
     array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
@@ -49,7 +69,7 @@ class PrestissimoFileFetcher extends FileFetcher {
     $successCnt = $failureCnt = 0;
     $totalCnt = count($requests);
 
-    $multi = new CurlMulti;
+    $multi = new CurlMulti();
     $multi->setRequests($requests);
     do {
       $multi->setupEventLoop();
@@ -58,7 +78,7 @@ class PrestissimoFileFetcher extends FileFetcher {
       $successCnt += $result['successCnt'];
       $failureCnt += $result['failureCnt'];
       foreach ($result['urls'] as $url) {
-        $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true, \Composer\IO\IOInterface::VERBOSE);
+        $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true, IOInterface::VERBOSE);
       }
     } while ($multi->remain());
   }
