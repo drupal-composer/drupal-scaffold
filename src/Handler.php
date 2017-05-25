@@ -117,7 +117,7 @@ class Handler {
     $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $files, $this->io, $this->composer->getConfig());
     $fetcher->fetch($version, $webroot);
 
-    $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial());
+    $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial(), $this->io);
     $initialFileFetcher->fetch($version, $webroot);
 
     // Call post-scaffold scripts.

@@ -7,6 +7,7 @@
 
 namespace DrupalComposer\DrupalScaffold;
 
+use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
 
@@ -17,12 +18,18 @@ class FileFetcher {
    */
   protected $remoteFilesystem;
 
+  /**
+   * @var \Composer\IO\IOInterface
+   */
+  protected $io;
+
   protected $source;
   protected $filenames;
   protected $fs;
 
-  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = []) {
+  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = [], IOInterface $io) {
     $this->remoteFilesystem = $remoteFilesystem;
+    $this->io = $io;
     $this->source = $source;
     $this->filenames = $filenames;
     $this->fs = new Filesystem();
@@ -32,7 +39,13 @@ class FileFetcher {
     array_walk($this->filenames, function ($filename) use ($version, $destination) {
       $url = $this->getUri($filename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
+      $this->io->write("Going to download the file $filename");
+      $this->io->write("  from: $url");
+      $this->io->write("  to: $destination/$filename");
       $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename);
+      // Used to put a new line because the remote file system does not put
+      // one.
+      $this->io->write('');
     });
   }
 

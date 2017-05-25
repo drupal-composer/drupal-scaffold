@@ -15,18 +15,12 @@ use Hirak\Prestissimo\CurlMulti;
 class PrestissimoFileFetcher extends FileFetcher {
 
   /**
-   * @var \Composer\IO\IOInterface
-   */
-  protected $io;
-
-  /**
    * @var \Composer\Config
    */
   protected $config;
 
   public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, array $filenames = [], IOInterface $io, Config $config) {
-    parent::__construct($remoteFilesystem, $source, $filenames);
-    $this->io = $io;
+    parent::__construct($remoteFilesystem, $source, $filenames, $io);
     $this->config = $config;
   }
 
@@ -43,7 +37,10 @@ class PrestissimoFileFetcher extends FileFetcher {
     array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
       $url = $this->getUri($filename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
+      $this->io->write("Going to download the file $filename");
+      $this->io->write("  from: $url");
       $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
+      $this->io->write("  to: $destination/$filename");
     });
 
     $successCnt = $failureCnt = 0;
