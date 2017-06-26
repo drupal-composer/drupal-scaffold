@@ -77,6 +77,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     $handler->downloadScaffold();
     // Generate the autoload.php file after generating the scaffold files.
     $handler->generateAutoload();
-    return true;
+    return 0;
   }
 }
