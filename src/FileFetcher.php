@@ -23,29 +23,40 @@ class FileFetcher {
    */
   protected $io;
 
+  /**
+   * @var bool
+   *
+   * A boolean indicating if progress should be displayed.
+   */
+  protected $progress;
+
   protected $source;
   protected $filenames;
   protected $fs;
 
-  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = [], IOInterface $io) {
+  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = [], IOInterface $io, $progress = TRUE) {
     $this->remoteFilesystem = $remoteFilesystem;
     $this->io = $io;
     $this->source = $source;
     $this->filenames = $filenames;
     $this->fs = new Filesystem();
+    $this->progress = $progress;
   }
 
   public function fetch($version, $destination) {
     array_walk($this->filenames, function ($filename) use ($version, $destination) {
       $url = $this->getUri($filename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      $this->io->write("Going to download the file $filename");
-      $this->io->write("  from: $url");
-      $this->io->write("  to: $destination/$filename");
-      $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename);
-      // Used to put a new line because the remote file system does not put
-      // one.
-      $this->io->write('');
+      if ($this->progress) {
+        $this->io->writeError("  - <info>$filename</info> (<comment>$url</comment>): ", FALSE);
+        $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename, $this->progress);
+        // Used to put a new line because the remote file system does not put
+        // one.
+        $this->io->writeError('');
+      }
+      else {
+        $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename, $this->progress);
+      }
     });
   }
 

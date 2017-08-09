@@ -19,8 +19,8 @@ class PrestissimoFileFetcher extends FileFetcher {
    */
   protected $config;
 
-  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, array $filenames = [], IOInterface $io, Config $config) {
-    parent::__construct($remoteFilesystem, $source, $filenames, $io);
+  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, array $filenames = [], IOInterface $io, $progress = TRUE, Config $config) {
+    parent::__construct($remoteFilesystem, $source, $filenames, $io, $progress);
     $this->config = $config;
   }
 
@@ -37,10 +37,16 @@ class PrestissimoFileFetcher extends FileFetcher {
     array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
       $url = $this->getUri($filename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      $this->io->write("Going to download the file $filename");
-      $this->io->write("  from: $url");
-      $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
-      $this->io->write("  to: $destination/$filename");
+      if ($this->progress) {
+        $this->io->writeError("  - <info>$filename</info> (<comment>$url</comment>): ", FALSE);
+        $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
+        // Used to put a new line because the remote file system does not put
+        // one.
+        $this->io->writeError('');
+      }
+      else {
+        $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
+      }
     });
 
     $successCnt = $failureCnt = 0;
@@ -54,8 +60,10 @@ class PrestissimoFileFetcher extends FileFetcher {
       $result = $multi->getFinishedResults();
       $successCnt += $result['successCnt'];
       $failureCnt += $result['failureCnt'];
-      foreach ($result['urls'] as $url) {
-        $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true, \Composer\IO\IOInterface::VERBOSE);
+      if ($this->progress) {
+        foreach ($result['urls'] as $url) {
+          $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true, \Composer\IO\IOInterface::VERBOSE);
+        }
       }
     } while ($multi->remain());
   }
