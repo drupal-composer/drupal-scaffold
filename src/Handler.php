@@ -80,7 +80,12 @@ class Handler {
    * @param \Composer\Plugin\CommandEvent $event
    */
   public function onCmdBeginsEvent(\Composer\Plugin\CommandEvent $event) {
-    $this->progress = !($event->getInput()->getOption('no-progress'));
+    if ($event->getInput()->hasOption('no-progress')) {
+      $this->progress = !($event->getInput()->getOption('no-progress'));
+    }
+    else {
+      $this->progress = TRUE;
+    }
   }
 
   /**
