@@ -37,16 +37,7 @@ class PrestissimoFileFetcher extends FileFetcher {
     array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
       $url = $this->getUri($filename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      if ($this->progress) {
-        $this->io->writeError("  - <info>$filename</info> (<comment>$url</comment>): ", FALSE);
-        $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
-        // Used to put a new line because the remote file system does not put
-        // one.
-        $this->io->writeError('');
-      }
-      else {
-        $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
-      }
+      $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
     });
 
     $successCnt = $failureCnt = 0;
@@ -62,7 +53,7 @@ class PrestissimoFileFetcher extends FileFetcher {
       $failureCnt += $result['failureCnt'];
       if ($this->progress) {
         foreach ($result['urls'] as $url) {
-          $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true, \Composer\IO\IOInterface::VERBOSE);
+          $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true);
         }
       }
     } while ($multi->remain());
