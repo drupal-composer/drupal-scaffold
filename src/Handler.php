@@ -133,7 +133,7 @@ class Handler {
     // Only install the scaffolding if drupal/core was installed,
     // AND there are no scaffolding files present.
     if (isset($this->drupalCorePackage)) {
-      $this->downloadScaffold($event->isDevMode());
+      $this->downloadScaffold($event);
       // Generate the autoload.php file after generating the scaffold files.
       $this->generateAutoload();
     }
@@ -142,10 +142,10 @@ class Handler {
   /**
    * Downloads drupal scaffold files for the current process.
    *
-   * @param bool $dev
-   *   TRUE if dev packages are installed. FALSE otherwise.
+   * @param \Composer\Script\Event $event
+   *   The Composer event.
    */
-  public function downloadScaffold($dev = FALSE) {
+  public function downloadScaffold($event) {
     $drupalCorePackage = $this->getDrupalCorePackage();
     $webroot = realpath($this->getWebRoot());
 
@@ -153,7 +153,7 @@ class Handler {
     $options = $this->getOptions();
     $includes = $this->getIncludes();
     // Check dev files if necessary.
-    if ($dev) {
+    if ($event->isDevMode()) {
       $includes = array_merge($includes, $this->getIncludesDev());
     }
     $files = array_diff($includes, $this->getExcludes());
