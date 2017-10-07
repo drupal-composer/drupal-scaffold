@@ -63,15 +63,22 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testFetch() {
-    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', ['.htaccess', 'sites/default/default.settings.php'], new NullIO());
-    $fetcher->fetch('8.1.1', $this->tmpDir);
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
+    $fetcher->setFilenames([
+      '.htaccess' => '.htaccess',
+      'sites/default/default.settings.php' => 'sites/default/default.settings.php',
+    ]);
+    $fetcher->fetch('8.1.1', $this->tmpDir, true);
     $this->assertFileExists($this->tmpDir . '/.htaccess');
     $this->assertFileExists($this->tmpDir . '/sites/default/default.settings.php');
   }
 
   public function testInitialFetch() {
-    $fetcher = new InitialFileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', ['sites/default/default.settings.php' => 'sites/default/settings.php'], new NullIO());
-    $fetcher->fetch('8.1.1', $this->tmpDir);
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
+    $fetcher->setFilenames([
+      'sites/default/default.settings.php' => 'sites/default/settings.php',
+    ]);
+    $fetcher->fetch('8.1.1', $this->tmpDir, false);
     $this->assertFileExists($this->tmpDir . '/sites/default/settings.php');
   }
 }

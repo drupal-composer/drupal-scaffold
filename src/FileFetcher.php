@@ -34,30 +34,36 @@ class FileFetcher {
   protected $filenames;
   protected $fs;
 
-  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = [], IOInterface $io, $progress = TRUE) {
+  public function __construct(RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE) {
     $this->remoteFilesystem = $remoteFilesystem;
     $this->io = $io;
     $this->source = $source;
-    $this->filenames = $filenames;
     $this->fs = new Filesystem();
     $this->progress = $progress;
   }
 
-  public function fetch($version, $destination) {
-    array_walk($this->filenames, function ($filename) use ($version, $destination) {
-      $url = $this->getUri($filename, $version);
-      $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      if ($this->progress) {
-        $this->io->writeError("  - <info>$filename</info> (<comment>$url</comment>): ", FALSE);
-        $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename, $this->progress);
-        // Used to put a new line because the remote file system does not put
-        // one.
-        $this->io->writeError('');
+  public function fetch($version, $destination, $erase) {
+    foreach ($this->filenames as $sourceFilename => $filename) {
+      $target = "$destination/$filename";
+      if ($erase || !file_exists($target)) {
+        $url = $this->getUri($sourceFilename, $version);
+        $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
+        if ($this->progress) {
+          $this->io->writeError("  - <info>$filename</info> (<comment>$url</comment>): ", FALSE);
+          $this->remoteFilesystem->copy($url, $url, $target, $this->progress);
+          // Used to put a new line because the remote file system does not put
+          // one.
+          $this->io->writeError('');
+        }
+        else {
+          $this->remoteFilesystem->copy($url, $url, $target, $this->progress);
+        }
       }
-      else {
-        $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename, $this->progress);
-      }
-    });
+    }
+  }
+
+  public function setFilenames(array $filenames) {
+    $this->filenames = $filenames;
   }
 
   protected function getUri($filename, $version) {

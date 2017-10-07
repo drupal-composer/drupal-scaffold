@@ -19,26 +19,30 @@ class PrestissimoFileFetcher extends FileFetcher {
    */
   protected $config;
 
-  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, array $filenames = [], IOInterface $io, $progress = TRUE, Config $config) {
-    parent::__construct($remoteFilesystem, $source, $filenames, $io, $progress);
+  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE, Config $config) {
+    parent::__construct($remoteFilesystem, $source, $io, $progress);
     $this->config = $config;
   }
 
-  public function fetch($version, $destination) {
+  public function fetch($version, $destination, $erase) {
     if (class_exists(CurlMulti::class)) {
-      $this->fetchWithPrestissimo($version, $destination);
+      $this->fetchWithPrestissimo($version, $destination, $erase);
       return;
     }
-    parent::fetch($version, $destination);
+    parent::fetch($version, $destination, $erase);
   }
 
-  protected function fetchWithPrestissimo($version, $destination) {
+  protected function fetchWithPrestissimo($version, $destination, $erase) {
     $requests = [];
-    array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
-      $url = $this->getUri($filename, $version);
-      $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
-    });
+
+    foreach ($this->filenames as $sourceFilename => $filename) {
+      $target = "$destination/$filename";
+      if ($erase || !file_exists($target)) {
+        $url = $this->getUri($sourceFilename, $version);
+        $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
+        $requests[] = new CopyRequest($url, $target, false, $this->io, $this->config);
+      }
+    }
 
     $successCnt = $failureCnt = 0;
     $totalCnt = count($requests);

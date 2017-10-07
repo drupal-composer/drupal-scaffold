@@ -136,11 +136,12 @@ class Handler {
 
     $remoteFs = new RemoteFilesystem($this->io);
 
-    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $files, $this->io, $this->progress, $this->composer->getConfig());
-    $fetcher->fetch($version, $webroot);
+    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $this->io, $this->progress, $this->composer->getConfig());
+    $fetcher->setFilenames(array_combine($files, $files));
+    $fetcher->fetch($version, $webroot, true);
 
-    $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial(), $this->io, $this->progress);
-    $initialFileFetcher->fetch($version, $webroot);
+    $fetcher->setFilenames($this->getInitial());
+    $fetcher->fetch($version, $webroot, false);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
