@@ -40,8 +40,9 @@ class PrestissimoFileFetcher extends FileFetcher {
 
   protected function fetchWithPrestissimo($version, $destination) {
     $requests = [];
-    array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
-      $url = $this->getUri($filename, $version);
+    array_walk($this->filenames, function ($filename, $sourceFilename) use ($version, $destination, &$requests) {
+      $sourceFilename = is_numeric($sourceFilename) ? $filename : $sourceFilename;
+      $url = $this->getUri($sourceFilename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
       $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
     });

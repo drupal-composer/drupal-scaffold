@@ -29,8 +29,9 @@ class FileFetcher {
   }
 
   public function fetch($version, $destination) {
-    array_walk($this->filenames, function ($filename) use ($version, $destination) {
-      $url = $this->getUri($filename, $version);
+    array_walk($this->filenames, function ($filename, $sourceFilename) use ($version, $destination) {
+      $sourceFilename = is_numeric($sourceFilename) ? $filename : $sourceFilename;
+      $url = $this->getUri($sourceFilename, $version);
       $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
       $this->remoteFilesystem->copy($url, $url, $destination . '/' . $filename);
     });
