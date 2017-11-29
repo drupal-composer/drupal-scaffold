@@ -103,7 +103,7 @@ class Handler {
 
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
-    $files = array_diff($this->getIncludes(), $this->getExcludes());
+    $files = $this->getFiles();
 
     // Call any pre-scaffold scripts that may be defined.
     $dispatcher = new EventDispatcher($this->composer, $this->io);
@@ -240,6 +240,10 @@ EOF;
     return $this->composer->getRepositoryManager()->getLocalRepository()->findPackage($name, '*');
   }
 
+  protected function getFiles() {
+    return array_diff_key($this->getIncludes(), $this->getExcludes());
+  }
+
   /**
    * Retrieve excludes from optional "extra" configuration.
    *
@@ -280,7 +284,15 @@ EOF;
     if (empty($options['omit-defaults'])) {
       $result = $this->$defaultFn();
     }
-    $result = array_merge($result, (array) $options[$optionName]);
+    foreach ((array)$options[$optionName] as $sourceFile => $destFile) {
+      // Allow any option list to be specified as a simple array, or an
+      // associative array specifying source and destination.  Convert
+      // simple arrays to associative arrays.
+      if(is_numeric($sourceFile)) {
+        $sourceFile = $destFile;
+      }
+      $result[$sourceFile] = $destFile;
+    }
 
     return $result;
   }
@@ -352,7 +364,7 @@ EOF;
     }
 
     sort($common);
-    return $common;
+    return array_combine($common, $common);
   }
 
   /**
