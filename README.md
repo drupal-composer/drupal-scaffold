@@ -86,6 +86,25 @@ The `initial` hash lists files that should be copied over only if they do not
 exist in the destination. The key specifies the path to the source file, and
 the value indicates the path to the destination file.
 
+## Changing destination paths
+
+By using an associative array for `includes`, destination paths can be specified
+that are different than the source paths.  For example, if you wanted to install
+`example.settings.local.php` into `sites/default/` instead of `sites/`:
+
+```json
+{
+  "extra": {
+    "drupal-scaffold": {
+      "source": "http://cgit.drupalcode.org/drupal/plain/{path}?h={version}",
+      "includes": {
+        "sites/example.settings.local.php": "sites/default/example.settings.local.php"
+      },
+    }
+  }
+}
+```
+
 ## Limitation
 
 When using Composer to install or update the Drupal development branch, the
