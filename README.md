@@ -64,6 +64,7 @@ Default includes are provided by the plugin:
 .eslintrc (Drupal <= 8.2.x)
 .eslintrc.json (Drupal >= 8.3.x)
 .gitattributes
+.ht.router.php (Drupal >= 8.5.x)
 .htaccess
 index.php
 robots.txt
