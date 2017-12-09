@@ -415,7 +415,6 @@ EOF;
       '.csslintrc',
       '.editorconfig',
       '.eslintignore',
-      '.eslintrc.json',
       '.gitattributes',
       'sites/development.services.yml',
     ];
