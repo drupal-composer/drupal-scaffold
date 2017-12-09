@@ -13,7 +13,7 @@ class PluginTest extends BaseTest {
   public function testComposerInstallAndUpdate() {
     $exampleScaffoldFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'index.php';
     $this->assertFileNotExists($exampleScaffoldFile, 'Scaffold file should not be exist.');
-    $this->composer('install --no-dev --prefer-dist');
+    $this->composer('install --prefer-dist');
     $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . 'core', 'Drupal core is installed.');
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be automatically installed.');
     $this->fs->remove($exampleScaffoldFile);
@@ -27,7 +27,7 @@ class PluginTest extends BaseTest {
       touch($exampleScaffoldFile);
       $mtime_touched = filemtime($exampleScaffoldFile);
       // Requiring a newer version triggers "composer update".
-      $this->composer('require --update-with-dependencies --prefer-dist --update-no-dev drupal/core:"' . $version . '"');
+      $this->composer('require --update-with-dependencies --prefer-dist drupal/core:"' . $version . '"');
       clearstatcache();
       $mtime_after = filemtime($exampleScaffoldFile);
       $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update. (' . $version . ')');
