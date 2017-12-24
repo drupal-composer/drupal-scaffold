@@ -42,10 +42,10 @@ class FileFetcher {
     $this->progress = $progress;
   }
 
-  public function fetch($version, $destination, $erase) {
+  public function fetch($version, $destination, $override) {
     foreach ($this->filenames as $sourceFilename => $filename) {
       $target = "$destination/$filename";
-      if ($erase || !file_exists($target)) {
+      if ($override || !file_exists($target)) {
         $url = $this->getUri($sourceFilename, $version);
         $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
         if ($this->progress) {

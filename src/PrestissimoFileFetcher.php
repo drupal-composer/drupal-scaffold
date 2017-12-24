@@ -24,20 +24,20 @@ class PrestissimoFileFetcher extends FileFetcher {
     $this->config = $config;
   }
 
-  public function fetch($version, $destination, $erase) {
+  public function fetch($version, $destination, $override) {
     if (class_exists(CurlMulti::class)) {
-      $this->fetchWithPrestissimo($version, $destination, $erase);
+      $this->fetchWithPrestissimo($version, $destination, $override);
       return;
     }
-    parent::fetch($version, $destination, $erase);
+    parent::fetch($version, $destination, $override);
   }
 
-  protected function fetchWithPrestissimo($version, $destination, $erase) {
+  protected function fetchWithPrestissimo($version, $destination, $override) {
     $requests = [];
 
     foreach ($this->filenames as $sourceFilename => $filename) {
       $target = "$destination/$filename";
-      if ($erase || !file_exists($target)) {
+      if ($override || !file_exists($target)) {
         $url = $this->getUri($sourceFilename, $version);
         $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
         $requests[] = new CopyRequest($url, $target, false, $this->io, $this->config);
