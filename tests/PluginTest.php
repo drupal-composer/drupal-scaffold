@@ -15,20 +15,17 @@ use Composer\Util\Filesystem;
 class PluginTest extends \PHPUnit_Framework_TestCase {
 
   /**
-   * @var \Composer\Util\Filesystem
+   * @var Filesystem
    */
   protected $fs;
-
   /**
    * @var string
    */
   protected $tmpDir;
-
   /**
    * @var string
    */
   protected $rootDir;
-
   /**
    * @var string
    */
@@ -53,8 +50,6 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * tearDown
-   *
-   * @return void
    */
   public function tearDown()
   {
@@ -143,23 +138,23 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    * @return array
    */
   protected function composerJSONDefaults() {
-    return array(
-      'repositories' => array(
-        array(
+    return [
+      'repositories' => [
+        [
           'type' => 'vcs',
           'url' => $this->rootDir,
-        )
-      ),
-      'require' => array(
+        ]
+      ],
+      'require' => [
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
         'composer/installers' => '^1.0.20',
         'drupal/core' => '8.0.0',
-      ),
-      'scripts' => array(
+      ],
+      'scripts' => [
         'drupal-scaffold' =>  'DrupalComposer\\DrupalScaffold\\Plugin::scaffold'
-      ),
+      ],
       'minimum-stability' => 'dev',
-    );
+    ];
   }
 
   /**
@@ -167,6 +162,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    *
    * @param string $command
    *   Composer command name, arguments and/or options
+   * @throws \Exception
    */
   protected function composer($command) {
     chdir($this->tmpDir);
@@ -181,6 +177,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    *
    * @param $command
    *   Git command name, arguments and/or options.
+   * @throws \Exception
    */
   protected function git($command) {
     chdir($this->rootDir);

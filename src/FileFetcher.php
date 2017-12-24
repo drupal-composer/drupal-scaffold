@@ -13,21 +13,39 @@ use Composer\Util\RemoteFilesystem;
 class FileFetcher {
 
   /**
-   * @var \Composer\Util\RemoteFilesystem
+   * @var RemoteFilesystem
    */
   protected $remoteFilesystem;
 
   protected $source;
+
+  /**
+   * @var array
+   */
   protected $filenames;
+
+  /**
+   * @var Filesystem
+   */
   protected $fs;
 
-  public function __construct(RemoteFilesystem $remoteFilesystem, $source, $filenames = []) {
+  /**
+   * FileFetcher constructor.
+   * @param RemoteFilesystem $remoteFilesystem
+   * @param $source
+   * @param array $filenames
+   */
+  public function __construct(RemoteFilesystem $remoteFilesystem, $source, array $filenames = []) {
     $this->remoteFilesystem = $remoteFilesystem;
     $this->source = $source;
     $this->filenames = $filenames;
     $this->fs = new Filesystem();
   }
 
+  /**
+   * @param $version
+   * @param $destination
+   */
   public function fetch($version, $destination) {
     array_walk($this->filenames, function ($filename) use ($version, $destination) {
       $url = $this->getUri($filename, $version);
@@ -36,6 +54,11 @@ class FileFetcher {
     });
   }
 
+  /**
+   * @param $filename
+   * @param $version
+   * @return mixed
+   */
   protected function getUri($filename, $version) {
     $map = [
       '{path}' => $filename,

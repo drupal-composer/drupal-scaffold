@@ -20,17 +20,14 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
    * @var \Composer\Util\Filesystem
    */
   protected $fs;
-
   /**
    * @var string
    */
   protected $tmpDir;
-
   /**
    * @var string
    */
   protected $rootDir;
-
   /**
    * @var string
    */
