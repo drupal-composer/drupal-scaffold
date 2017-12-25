@@ -15,36 +15,34 @@ use Hirak\Prestissimo\CurlMulti;
 class PrestissimoFileFetcher extends FileFetcher {
 
   /**
-   * @var \Composer\IO\IOInterface
-   */
-  protected $io;
-
-  /**
    * @var \Composer\Config
    */
   protected $config;
 
-  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, array $filenames = [], IOInterface $io, Config $config) {
-    parent::__construct($remoteFilesystem, $source, $filenames);
-    $this->io = $io;
+  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE, Config $config) {
+    parent::__construct($remoteFilesystem, $source, $io, $progress);
     $this->config = $config;
   }
 
-  public function fetch($version, $destination) {
+  public function fetch($version, $destination, $override) {
     if (class_exists(CurlMulti::class)) {
-      $this->fetchWithPrestissimo($version, $destination);
+      $this->fetchWithPrestissimo($version, $destination, $override);
       return;
     }
-    parent::fetch($version, $destination);
+    parent::fetch($version, $destination, $override);
   }
 
-  protected function fetchWithPrestissimo($version, $destination) {
+  protected function fetchWithPrestissimo($version, $destination, $override) {
     $requests = [];
-    array_walk($this->filenames, function ($filename) use ($version, $destination, &$requests) {
-      $url = $this->getUri($filename, $version);
-      $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-      $requests[] = new CopyRequest($url, $destination . '/' . $filename, false, $this->io, $this->config);
-    });
+
+    foreach ($this->filenames as $sourceFilename => $filename) {
+      $target = "$destination/$filename";
+      if ($override || !file_exists($target)) {
+        $url = $this->getUri($sourceFilename, $version);
+        $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
+        $requests[] = new CopyRequest($url, $target, false, $this->io, $this->config);
+      }
+    }
 
     $successCnt = $failureCnt = 0;
     $totalCnt = count($requests);
@@ -57,8 +55,10 @@ class PrestissimoFileFetcher extends FileFetcher {
       $result = $multi->getFinishedResults();
       $successCnt += $result['successCnt'];
       $failureCnt += $result['failureCnt'];
-      foreach ($result['urls'] as $url) {
-        $this->io->writeError("    <comment>$successCnt/$totalCnt</comment>:\t$url", true, \Composer\IO\IOInterface::VERBOSE);
+      if ($this->progress) {
+        foreach ($result['urls'] as $url) {
+          $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info>", true);
+        }
       }
     } while ($multi->remain());
   }

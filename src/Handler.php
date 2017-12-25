@@ -34,6 +34,13 @@ class Handler {
   protected $io;
 
   /**
+   * @var bool
+   *
+   * A boolean indicating if progress should be displayed.
+   */
+  protected $progress;
+
+  /**
    * @var \Composer\Package\PackageInterface
    */
   protected $drupalCorePackage;
@@ -47,6 +54,7 @@ class Handler {
   public function __construct(Composer $composer, IOInterface $io) {
     $this->composer = $composer;
     $this->io = $io;
+    $this->progress = TRUE;
   }
 
   /**
@@ -64,6 +72,20 @@ class Handler {
       return $package;
     }
     return NULL;
+  }
+
+  /**
+   * Get the command options.
+   *
+   * @param \Composer\Plugin\CommandEvent $event
+   */
+  public function onCmdBeginsEvent(\Composer\Plugin\CommandEvent $event) {
+    if ($event->getInput()->hasOption('no-progress')) {
+      $this->progress = !($event->getInput()->getOption('no-progress'));
+    }
+    else {
+      $this->progress = TRUE;
+    }
   }
 
   /**
@@ -114,11 +136,12 @@ class Handler {
 
     $remoteFs = new RemoteFilesystem($this->io);
 
-    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $files, $this->io, $this->composer->getConfig());
-    $fetcher->fetch($version, $webroot);
+    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $this->io, $this->progress, $this->composer->getConfig());
+    $fetcher->setFilenames(array_combine($files, $files));
+    $fetcher->fetch($version, $webroot, true);
 
-    $initialFileFetcher = new InitialFileFetcher($remoteFs, $options['source'], $this->getInitial());
-    $initialFileFetcher->fetch($version, $webroot);
+    $fetcher->setFilenames($this->getInitial());
+    $fetcher->fetch($version, $webroot, false);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
