@@ -2,7 +2,7 @@
     "name": "drupal-composer/drupal-scaffold",
     "description": "Composer Plugin for updating the Drupal scaffold files when using drupal/core",
     "type": "composer-plugin",
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "require": {
         "php": ">=5.4.5",
         "composer-plugin-api": "^1.0.0",
