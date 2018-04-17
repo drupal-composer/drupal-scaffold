@@ -86,4 +86,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     $this->handler->onPostCmdEvent($event);
   }
 
+  /**
+   * Script callback for putting in composer scripts to download the
+   * scaffold files.
+   *
+   * @param \Composer\Script\Event $event
+   *
+   * @deprecated since version 2.5.0, to be removed in 3.0. Use the command
+   *   "composer drupal:scaffold" instead.
+   */
+  public static function scaffold(\Composer\Script\Event $event) {
+    @trigger_error('\DrupalComposer\DrupalScaffold\Plugin::scaffold is deprecated since version 2.5.0 and will be removed in 3.0. Use "composer drupal:scaffold" instead.', E_USER_DEPRECATED);
+    $handler = new Handler($event->getComposer(), $event->getIO());
+    $handler->downloadScaffold();
+    // Generate the autoload.php file after generating the scaffold files.
+    $handler->generateAutoload();
+  }
+
 }

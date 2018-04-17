@@ -15,7 +15,6 @@ class DrupalScaffoldCommand extends BaseCommand {
     parent::configure();
     $this
       ->setName('drupal:scaffold')
-      ->setAliases(['drupal-scaffold'])
       ->setDescription('Update the Drupal scaffold files.');
   }
 
