@@ -4,6 +4,9 @@ namespace DrupalComposer\DrupalScaffold;
 
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 
+/**
+ * List of all commands provided by this package.
+ */
 class CommandProvider implements CommandProviderCapability {
 
   /**
@@ -11,7 +14,7 @@ class CommandProvider implements CommandProviderCapability {
    */
   public function getCommands() {
     return [
-      new DrupalScaffoldCommand()
+      new DrupalScaffoldCommand(),
     ];
   }
 

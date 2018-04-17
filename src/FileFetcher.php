@@ -1,16 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalComposer\DrupalScaffold\FileFetcher.
- */
-
 namespace DrupalComposer\DrupalScaffold;
 
 use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
 
+/**
+ * Downloads all required files and writes it to the file system.
+ */
 class FileFetcher {
 
   /**
@@ -34,6 +32,9 @@ class FileFetcher {
   protected $filenames;
   protected $fs;
 
+  /**
+   * Constructs this FileFetcher object.
+   */
   public function __construct(RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE) {
     $this->remoteFilesystem = $remoteFilesystem;
     $this->io = $io;
@@ -42,6 +43,9 @@ class FileFetcher {
     $this->progress = $progress;
   }
 
+  /**
+   * Downloads all required files and writes it to the file system.
+   */
   public function fetch($version, $destination, $override) {
     foreach ($this->filenames as $sourceFilename => $filename) {
       $target = "$destination/$filename";
@@ -62,14 +66,20 @@ class FileFetcher {
     }
   }
 
+  /**
+   * Set filenames.
+   */
   public function setFilenames(array $filenames) {
     $this->filenames = $filenames;
   }
 
+  /**
+   * Replace filename and version in the source pattern with their values.
+   */
   protected function getUri($filename, $version) {
     $map = [
       '{path}' => $filename,
-      '{version}' => $version
+      '{version}' => $version,
     ];
     return str_replace(array_keys($map), array_values($map), $this->source);
   }

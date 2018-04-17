@@ -1,18 +1,15 @@
 <?php
-/**
- * @file
- * Contains DrupalComposer\DrupalScaffold\Plugin.
- */
 
 namespace DrupalComposer\DrupalScaffold;
 
+use Composer\Script\Event;
+use Composer\Plugin\CommandEvent;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capable;
-use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
@@ -64,7 +61,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    *
    * @param \Composer\Plugin\CommandEvent $event
    */
-  public function cmdBegins(\Composer\Plugin\CommandEvent $event) {
+  public function cmdBegins(CommandEvent $event) {
     $this->handler->onCmdBeginsEvent($event);
   }
 
@@ -82,7 +79,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    *
    * @param \Composer\Script\Event $event
    */
-  public function postCmd(\Composer\Script\Event $event) {
+  public function postCmd(Event $event) {
     $this->handler->onPostCmdEvent($event);
   }
 
@@ -95,7 +92,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    * @deprecated since version 2.5.0, to be removed in 3.0. Use the command
    *   "composer drupal:scaffold" instead.
    */
-  public static function scaffold(\Composer\Script\Event $event) {
+  public static function scaffold(Event $event) {
     @trigger_error('\DrupalComposer\DrupalScaffold\Plugin::scaffold is deprecated since version 2.5.0 and will be removed in 3.0. Use "composer drupal:scaffold" instead.', E_USER_DEPRECATED);
     $handler = new Handler($event->getComposer(), $event->getIO());
     $handler->downloadScaffold();

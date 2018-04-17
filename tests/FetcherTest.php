@@ -1,18 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalComposer\DrupalScaffold\Tests\FetcherTest.
- */
-
 namespace DrupalComposer\DrupalScaffold\Tests;
 
-use Composer\Downloader\TransportException;
 use Composer\IO\NullIO;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
 use DrupalComposer\DrupalScaffold\FileFetcher;
-use DrupalComposer\DrupalScaffold\InitialFileFetcher;
 
 class FetcherTest extends \PHPUnit_Framework_TestCase {
 
@@ -37,7 +30,7 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
   protected $tmpReleaseTag;
 
   /**
-   * SetUp test
+   * SetUp test.
    */
   public function setUp() {
     $this->rootDir = realpath(realpath(__DIR__ . '/..'));
@@ -59,7 +52,7 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
     if (is_dir($directory)) {
       $this->fs->removeDirectory($directory);
     }
-    mkdir($directory, 0777, true);
+    mkdir($directory, 0777, TRUE);
   }
 
   public function testFetch() {
@@ -68,17 +61,18 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
       '.htaccess' => '.htaccess',
       'sites/default/default.settings.php' => 'sites/default/default.settings.php',
     ]);
-    $fetcher->fetch('8.1.1', $this->tmpDir, true);
+    $fetcher->fetch('8.1.1', $this->tmpDir, TRUE);
     $this->assertFileExists($this->tmpDir . '/.htaccess');
     $this->assertFileExists($this->tmpDir . '/sites/default/default.settings.php');
   }
-
+  
   public function testInitialFetch() {
     $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
     $fetcher->setFilenames([
       'sites/default/default.settings.php' => 'sites/default/settings.php',
     ]);
-    $fetcher->fetch('8.1.1', $this->tmpDir, false);
+    $fetcher->fetch('8.1.1', $this->tmpDir, FALSE);
     $this->assertFileExists($this->tmpDir . '/sites/default/settings.php');
   }
+
 }
