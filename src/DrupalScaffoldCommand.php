@@ -6,6 +6,11 @@ use Composer\Command\BaseCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * The "drupal:scaffold" command class.
+ *
+ * Downloads scaffold files and generates the autoload.php file.
+ */
 class DrupalScaffoldCommand extends BaseCommand {
 
   /**

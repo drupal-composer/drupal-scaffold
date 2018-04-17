@@ -1,12 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalComposer\DrupalScaffold\Handler.
- */
-
 namespace DrupalComposer\DrupalScaffold;
 
+use Composer\Script\Event;
+use Composer\Installer\PackageEvent;
+use Composer\Plugin\CommandEvent;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
@@ -18,6 +16,9 @@ use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
+/**
+ * Core class of the plugin, contains all logic which files should be fetched.
+ */
 class Handler {
 
   const PRE_DRUPAL_SCAFFOLD_CMD = 'pre-drupal-scaffold-cmd';
@@ -48,8 +49,8 @@ class Handler {
   /**
    * Handler constructor.
    *
-   * @param Composer $composer
-   * @param IOInterface $io
+   * @param \Composer\Composer $composer
+   * @param \Composer\IO\IOInterface $io
    */
   public function __construct(Composer $composer, IOInterface $io) {
     $this->composer = $composer;
@@ -79,7 +80,7 @@ class Handler {
    *
    * @param \Composer\Plugin\CommandEvent $event
    */
-  public function onCmdBeginsEvent(\Composer\Plugin\CommandEvent $event) {
+  public function onCmdBeginsEvent(CommandEvent $event) {
     if ($event->getInput()->hasOption('no-progress')) {
       $this->progress = !($event->getInput()->getOption('no-progress'));
     }
@@ -93,7 +94,7 @@ class Handler {
    *
    * @param \Composer\Installer\PackageEvent $event
    */
-  public function onPostPackageEvent(\Composer\Installer\PackageEvent $event){
+  public function onPostPackageEvent(PackageEvent $event) {
     $package = $this->getCorePackage($event->getOperation());
     if ($package) {
       // By explicitly setting the core package, the onPostCmdEvent() will
@@ -107,7 +108,7 @@ class Handler {
    *
    * @param \Composer\Script\Event $event
    */
-  public function onPostCmdEvent(\Composer\Script\Event $event) {
+  public function onPostCmdEvent(Event $event) {
     // Only install the scaffolding if drupal/core was installed,
     // AND there are no scaffolding files present.
     if (isset($this->drupalCorePackage)) {
@@ -138,10 +139,10 @@ class Handler {
 
     $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $this->io, $this->progress, $this->composer->getConfig());
     $fetcher->setFilenames(array_combine($files, $files));
-    $fetcher->fetch($version, $webroot, true);
+    $fetcher->fetch($version, $webroot, TRUE);
 
     $fetcher->setFilenames($this->getInitial());
-    $fetcher->fetch($version, $webroot, false);
+    $fetcher->fetch($version, $webroot, FALSE);
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
@@ -212,7 +213,7 @@ EOF;
    * Look up the Drupal core package object, or return it from where we cached
    * it in the $drupalCorePackage field.
    *
-   * @return PackageInterface
+   * @return \Composer\Package\PackageInterface
    */
   public function getDrupalCorePackage() {
     if (!isset($this->drupalCorePackage)) {
@@ -240,7 +241,7 @@ EOF;
   /**
    * Retrieve the path to the web root.
    *
-   *  @return string
+   * @return string
    */
   public function getWebRoot() {
     $drupalCorePackage = $this->getDrupalCorePackage();
@@ -258,7 +259,7 @@ EOF;
    * @param string $name
    *   Name of the package to get from the current composer installation.
    *
-   * @return PackageInterface
+   * @return \Composer\Package\PackageInterface
    */
   protected function getPackage($name) {
     return $this->composer->getRepositoryManager()->getLocalRepository()->findPackage($name, '*');
@@ -361,7 +362,7 @@ EOF;
       'sites/example.settings.local.php',
       'sites/example.sites.php',
       'update.php',
-      'web.config'
+      'web.config',
     ];
 
     // Version specific variations.

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalComposer\DrupalScaffold\Tests\PluginTest.
- */
-
 namespace DrupalComposer\DrupalScaffold\Tests;
 
 use Composer\Util\Filesystem;
@@ -35,7 +30,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
   protected $tmpReleaseTag;
 
   /**
-   * SetUp test
+   * SetUp test.
    */
   public function setUp() {
     $this->rootDir = realpath(realpath(__DIR__ . '/..'));
@@ -52,12 +47,11 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
-   * tearDown
+   * TearDown.
    *
    * @return void
    */
-  public function tearDown()
-  {
+  public function tearDown() {
     $this->fs->removeDirectory($this->tmpDir);
     $this->git(sprintf('tag -d "%s"', $this->tmpReleaseTag));
   }
@@ -81,8 +75,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
       // the scaffold update.
       touch($exampleScaffoldFile);
       $mtime_touched = filemtime($exampleScaffoldFile);
-      // Requiring a newer version triggers "composer update"
-      $this->composer('require --update-with-dependencies --prefer-dist --update-no-dev drupal/core:"' . $version .'"');
+      // Requiring a newer version triggers "composer update".
+      $this->composer('require --update-with-dependencies --prefer-dist --update-no-dev drupal/core:"' . $version . '"');
       clearstatcache();
       $mtime_after = filemtime($exampleScaffoldFile);
       $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by composer update. (' . $version . ')');
@@ -93,12 +87,14 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
           $this->assertFileNotExists($this->tmpDir . DIRECTORY_SEPARATOR . '.eslintrc.json');
           $this->assertFileNotExists($this->tmpDir . DIRECTORY_SEPARATOR . '.ht.router.php');
           break;
+
         case '8.3.0':
           // Note we don't clean up .eslintrc file.
           $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . '.eslintrc');
           $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . '.eslintrc.json');
           $this->assertFileNotExists($this->tmpDir . DIRECTORY_SEPARATOR . '.ht.router.php');
           break;
+
         case '8.5.x-dev':
           $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . '.eslintrc');
           $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . '.eslintrc.json');
@@ -148,7 +144,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
         array(
           'type' => 'vcs',
           'url' => $this->rootDir,
-        )
+        ),
       ),
       'require' => array(
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
@@ -156,7 +152,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
         'drupal/core' => '8.0.0',
       ),
       'scripts' => array(
-        'drupal-scaffold' =>  'DrupalComposer\\DrupalScaffold\\Plugin::scaffold'
+        'drupal-scaffold' => 'DrupalComposer\\DrupalScaffold\\Plugin::scaffold',
       ),
       'minimum-stability' => 'dev',
     );
@@ -166,7 +162,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
    * Wrapper for the composer command.
    *
    * @param string $command
-   *   Composer command name, arguments and/or options
+   *   Composer command name, arguments and/or options.
    */
   protected function composer($command) {
     chdir($this->tmpDir);
@@ -199,6 +195,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     if (is_dir($directory)) {
       $this->fs->removeDirectory($directory);
     }
-    mkdir($directory, 0777, true);
+    mkdir($directory, 0777, TRUE);
   }
+
 }

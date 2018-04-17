@@ -1,17 +1,17 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalComposer\DrupalScaffold\FileFetcher.
- */
-
 namespace DrupalComposer\DrupalScaffold;
 
+use Composer\Util\RemoteFilesystem;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Hirak\Prestissimo\CopyRequest;
 use Hirak\Prestissimo\CurlMulti;
 
+/**
+ * Extends the default FileFetcher and uses hirak/prestissimo for parallel
+ * downloads.
+ */
 class PrestissimoFileFetcher extends FileFetcher {
 
   /**
@@ -19,11 +19,17 @@ class PrestissimoFileFetcher extends FileFetcher {
    */
   protected $config;
 
-  public function __construct(\Composer\Util\RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE, Config $config) {
+  /**
+   * Constructs this PrestissimoFileFetcher object.
+   */
+  public function __construct(RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE, Config $config) {
     parent::__construct($remoteFilesystem, $source, $io, $progress);
     $this->config = $config;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function fetch($version, $destination, $override) {
     if (class_exists(CurlMulti::class)) {
       $this->fetchWithPrestissimo($version, $destination, $override);
@@ -32,6 +38,9 @@ class PrestissimoFileFetcher extends FileFetcher {
     parent::fetch($version, $destination, $override);
   }
 
+  /**
+   * Fetch files in parallel.
+   */
   protected function fetchWithPrestissimo($version, $destination, $override) {
     $requests = [];
 
@@ -40,14 +49,14 @@ class PrestissimoFileFetcher extends FileFetcher {
       if ($override || !file_exists($target)) {
         $url = $this->getUri($sourceFilename, $version);
         $this->fs->ensureDirectoryExists($destination . '/' . dirname($filename));
-        $requests[] = new CopyRequest($url, $target, false, $this->io, $this->config);
+        $requests[] = new CopyRequest($url, $target, FALSE, $this->io, $this->config);
       }
     }
 
     $successCnt = $failureCnt = 0;
     $totalCnt = count($requests);
 
-    $multi = new CurlMulti;
+    $multi = new CurlMulti();
     $multi->setRequests($requests);
     do {
       $multi->setupEventLoop();
@@ -57,7 +66,7 @@ class PrestissimoFileFetcher extends FileFetcher {
       $failureCnt += $result['failureCnt'];
       if ($this->progress) {
         foreach ($result['urls'] as $url) {
-          $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info>", true);
+          $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info>", TRUE);
         }
       }
     } while ($multi->remain());
