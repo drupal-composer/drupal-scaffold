@@ -322,7 +322,7 @@ EOF;
       'excludes' => [],
       'includes' => [],
       'initial' => [],
-      'source' => 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
+      'source' => 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
       // Github: https://raw.githubusercontent.com/drupal/drupal/{version}/{path}
     ];
     return $options;
@@ -346,7 +346,7 @@ EOF;
     /**
      * Files from 8.3.x
      *
-     * @see http://cgit.drupalcode.org/drupal/tree/?h=8.3.x
+     * @see https://cgit.drupalcode.org/drupal/tree/?h=8.3.x
      */
     $common = [
       '.csslintrc',

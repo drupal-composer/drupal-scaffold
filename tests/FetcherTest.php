@@ -56,7 +56,7 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testFetch() {
-    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
     $fetcher->setFilenames([
       '.htaccess' => '.htaccess',
       'sites/default/default.settings.php' => 'sites/default/default.settings.php',
@@ -65,9 +65,9 @@ class FetcherTest extends \PHPUnit_Framework_TestCase {
     $this->assertFileExists($this->tmpDir . '/.htaccess');
     $this->assertFileExists($this->tmpDir . '/sites/default/default.settings.php');
   }
-  
+
   public function testInitialFetch() {
-    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'http://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
     $fetcher->setFilenames([
       'sites/default/default.settings.php' => 'sites/default/settings.php',
     ]);
