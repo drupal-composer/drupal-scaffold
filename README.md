@@ -30,7 +30,7 @@ of your root `composer.json`.
 {
   "extra": {
     "drupal-scaffold": {
-      "source": "http://cgit.drupalcode.org/drupal/plain/{path}?h={version}",
+      "source": "https://cgit.drupalcode.org/drupal/plain/{path}?h={version}",
       "excludes": [
         "google123.html",
         "robots.txt"
