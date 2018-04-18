@@ -67,8 +67,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be automatically installed.');
     $this->fs->remove($exampleScaffoldFile);
     $this->assertFileNotExists($exampleScaffoldFile, 'Scaffold file should not be exist.');
-    $this->composer('drupal-scaffold');
-    $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be installed by "drupal-scaffold" command.');
+    $this->composer('drupal:scaffold');
+    $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be installed by "drupal:scaffold" command.');
 
     foreach (['8.0.1', '8.1.x-dev', '8.3.0', '8.5.x-dev'] as $version) {
       // We touch a scaffold file, so we can check the file was modified after
@@ -108,7 +108,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     touch($exampleScaffoldFile);
     clearstatcache();
     $mtime_touched = filemtime($exampleScaffoldFile);
-    $this->composer('drupal-scaffold');
+    $this->composer('drupal:scaffold');
     clearstatcache();
     $mtime_after = filemtime($exampleScaffoldFile);
     $this->assertNotEquals($mtime_after, $mtime_touched, 'Scaffold file was modified by custom command.');
@@ -150,9 +150,6 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
         'composer/installers' => '^1.0.20',
         'drupal/core' => '8.0.0',
-      ),
-      'scripts' => array(
-        'drupal-scaffold' => 'DrupalComposer\\DrupalScaffold\\Plugin::scaffold',
       ),
       'minimum-stability' => 'dev',
     );
