@@ -103,8 +103,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
       }
     }
 
-    // We touch a scaffold file, so we can check the file was modified after
-    // the custom commandscaffold update.
+    // We touch a scaffold file, so we can check the file was modified by the
+    // custom command.
     file_put_contents($exampleScaffoldFile, 1);
     $this->composer('drupal:scaffold');
     $this->assertNotEquals(file_get_contents($exampleScaffoldFile), 1, 'Scaffold file was modified by custom command.');
