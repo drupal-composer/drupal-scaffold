@@ -23,7 +23,7 @@ class HandlerTest extends BaseTest {
     $this->composer('install --no-dev');
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should exist.');
     $this->assertFileNotExists($developmentScaffoldFile, 'Development scaffold file should not exist.');
-    $this->composer('drupal-scaffold');
+    $this->composer('drupal:scaffold');
     $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should exist.');
     $this->assertFileExists($developmentScaffoldFile, 'Development scaffold file should exist.');
   }
@@ -35,7 +35,7 @@ class HandlerTest extends BaseTest {
    */
   protected function composerJSONDefaults() {
     $composerJsonDefault = parent::composerJSONDefaults();
-    $composerJsonDefault['prefer-stable'] = true;
+    $composerJsonDefault['prefer-stable'] = TRUE;
     return $composerJsonDefault;
   }
 
