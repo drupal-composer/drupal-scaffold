@@ -55,6 +55,9 @@ class PrestissimoFileFetcher extends FileFetcher {
 
     $successCnt = $failureCnt = 0;
     $totalCnt = count($requests);
+    if ($totalCnt == 0) {
+      return;
+    }    
 
     $multi = new CurlMulti();
     $multi->setRequests($requests);
