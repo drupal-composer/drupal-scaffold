@@ -32,7 +32,7 @@
         ],
         "scenario": "scenarios/install",
         "post-update-cmd": [
-            "create-scenario phpunit4 'phpunit/phpunit:^4.4' --platform-php '5.5.27'"
+            "create-scenario phpunit4 'phpunit/phpunit:^4.8.36' --platform-php '5.5.27'"
         ]
     },
     "config": {
