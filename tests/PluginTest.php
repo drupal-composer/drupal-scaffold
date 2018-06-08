@@ -3,6 +3,7 @@
 namespace DrupalComposer\DrupalScaffold\Tests;
 
 use Composer\Util\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Tests composer plugin functionality.
@@ -108,6 +109,24 @@ class PluginTest extends \PHPUnit_Framework_TestCase {
     file_put_contents($exampleScaffoldFile, 1);
     $this->composer('drupal:scaffold');
     $this->assertNotEquals(file_get_contents($exampleScaffoldFile), 1, 'Scaffold file was modified by custom command.');
+  }
+
+  /**
+   * Tests a simple composer install with composer.lock in place
+   */
+  public function testComposerInstallWithLock() {
+    // Prepare composer.lock file
+    $exampleScaffoldFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'index.php';
+    $this->composer('install');
+    $finder = new Finder();
+    $finder->depth('== 0')->ignoreDotFiles(FALSE)->notName('/^composer\.(lock|json)$/')->in($this->tmpDir);
+    foreach ($finder as $file) {
+      $this->fs->remove($file->getRealPath());
+    }
+    $this->assertFileNotExists($exampleScaffoldFile, 'Scaffold file should not be exist.');
+    $this->composer('install');
+    $this->assertFileExists($this->tmpDir . DIRECTORY_SEPARATOR . 'core', 'Drupal core is installed.');
+    $this->assertFileExists($exampleScaffoldFile, 'Scaffold file should be automatically installed.');
   }
 
   /**
