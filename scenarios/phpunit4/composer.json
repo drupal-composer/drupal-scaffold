@@ -28,7 +28,8 @@
         ],
         "test": [
             "@lint",
-            "@unit"
+            "@unit",
+            "@cs"
         ],
         "scenario": "scenarios/install",
         "post-update-cmd": [
@@ -39,13 +40,15 @@
         "optimize-autoloader": true,
         "sort-packages": true,
         "platform": {
-            "php": "7.0.8"
-        }
+            "php": "5.5.27"
+        },
+        "vendor-dir": "../../vendor"
     },
     "require-dev": {
         "composer/composer": "dev-master",
-        "phpunit/phpunit": "^6",
-        "squizlabs/php_codesniffer": "^2.8",
-        "g1a/composer-test-scenarios": "^2.0"
-    }
+        "g1a/composer-test-scenarios": "^2.0",
+        "phpunit/phpunit": "^4.4",
+        "squizlabs/php_codesniffer": "^2.8"
+    },
+    "minimum-stability": "stable"
 }
