@@ -10,16 +10,16 @@ matrix:
   fast_finish: true
   include:
     - php: 7.2
-      env: 'DEPENCENCIES=highest'
+      env: DEPENDENCIES=update
     - php: 7.2
     - php: 7.1
     - php: 7.0.11
     - php: 5.6
-      env: 'SCENARIO=phpunit4'
+      env: 'SCENARIO="phpunit/phpunit:^4.8.36" DEPENDENCIES=update PLATFORM_PHP=5.5.27'
     - php: 5.5
-      env: 'SCENARIO=phpunit4'
+      env: 'SCENARIO="phpunit/phpunit:^4.8.36" DEPENDENCIES=update'
     - php: 5.5
-      env: 'SCENARIO=phpunit4 DEPENDENCIES=lowest'
+      env: 'SCENARIO="phpunit/phpunit:^4.8.36" DEPENDENCIES="update --prefer-lowest"'
 
 sudo: false
 
@@ -32,7 +32,9 @@ before_install:
   - composer --version
 
 install:
-  - 'composer scenario "${SCENARIO}" "${DEPENDENCIES}"'
+  - [[ -z "${PLATFORM_PHP}" ]] ||  composer -n config platform.php "${PLATFORM_PHP}"
+  - [[ -z "${SCENARIO}" ]] ||  composer -n require --dev --no-update "${SCENARIO}"
+  - 'composer "${DEPENDENCIES}"'
 
 before_script:
   - git config --global user.email "travisci@example.com"

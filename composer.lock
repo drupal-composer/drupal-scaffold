@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "818545081806eddb68c19466eb5d186b",
+    "content-hash": "50db99af5e0357a290a09367cdfe96de",
     "packages": [
         {
             "name": "composer/semver",
@@ -364,39 +364,6 @@
                 "instantiate"
             ],
             "time": "2015-06-14T21:17:01+00:00"
-        },
-        {
-            "name": "g1a/composer-test-scenarios",
-            "version": "2.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/g1a/composer-test-scenarios.git",
-                "reference": "d9a7619f6e1c01498fad19c34539bd5b0d2506ef"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/g1a/composer-test-scenarios/zipball/d9a7619f6e1c01498fad19c34539bd5b0d2506ef",
-                "reference": "d9a7619f6e1c01498fad19c34539bd5b0d2506ef",
-                "shasum": ""
-            },
-            "bin": [
-                "scripts/create-scenario",
-                "scripts/dependency-licenses",
-                "scripts/install-scenario"
-            ],
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Anderson",
-                    "email": "greg.1.anderson@greenknowe.org"
-                }
-            ],
-            "description": "Useful scripts for testing multiple sets of Composer dependencies.",
-            "time": "2018-05-25T16:45:48+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
