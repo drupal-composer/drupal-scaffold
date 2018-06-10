@@ -27,7 +27,7 @@ fi
 
 # If scenario is not specified, install the lockfile at
 # the root of the project.
-dir"=$base/${SCENARIO}"
+dir="$base/${SCENARIO}"
 if [ -z "$SCENARIO" ] || [ "$SCENARIO" == "default" ] ; then
   SCENARIO=default
   dir=.

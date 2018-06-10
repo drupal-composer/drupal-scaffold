@@ -371,12 +371,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/g1a/composer-test-scenarios.git",
-                "reference": "bb5cfc94a37b6b89d0f6002b6ffed683b1774258"
+                "reference": "4c2b990712dbcb87a0ab618e46f908c731c3a0bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/g1a/composer-test-scenarios/zipball/bb5cfc94a37b6b89d0f6002b6ffed683b1774258",
-                "reference": "bb5cfc94a37b6b89d0f6002b6ffed683b1774258",
+                "url": "https://api.github.com/repos/g1a/composer-test-scenarios/zipball/4c2b990712dbcb87a0ab618e46f908c731c3a0bb",
+                "reference": "4c2b990712dbcb87a0ab618e46f908c731c3a0bb",
                 "shasum": ""
             },
             "bin": [
@@ -396,7 +396,7 @@
                 }
             ],
             "description": "Useful scripts for testing multiple sets of Composer dependencies.",
-            "time": "2018-06-10T21:44:20+00:00"
+            "time": "2018-06-10T21:56:28+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
