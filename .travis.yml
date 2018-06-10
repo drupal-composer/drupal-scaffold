@@ -32,8 +32,8 @@ before_install:
   - composer --version
 
 install:
-  - [ -z "${PLATFORM_PHP}" ] ||  composer -n config platform.php "${PLATFORM_PHP}"
-  - [ -z "${SCENARIO}" ] ||  composer -n require --dev --no-update "${SCENARIO}"
+  - if [ -z "${PLATFORM_PHP}" ] ; then composer -n config platform.php "${PLATFORM_PHP}" ; fi
+  - if [ -z "${SCENARIO}" ] ; then composer -n require --dev --no-update "${SCENARIO}" ; fi
   - 'composer "${DEPENDENCIES}"'
 
 before_script:
