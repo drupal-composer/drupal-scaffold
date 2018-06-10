@@ -30,7 +30,7 @@
             "@lint",
             "@unit"
         ],
-        "scenario": "scenarios/install",
+        "scenario": ".scenarios.lock/install",
         "post-update-cmd": [
             "create-scenario phpunit4 'phpunit/phpunit:^4.8.36' --platform-php '5.5.27'"
         ]
@@ -44,8 +44,8 @@
     },
     "require-dev": {
         "composer/composer": "dev-master",
+        "g1a/composer-test-scenarios": "dev-scenarios-lock",
         "phpunit/phpunit": "^6",
-        "squizlabs/php_codesniffer": "^2.8",
-        "g1a/composer-test-scenarios": "^2.0"
+        "squizlabs/php_codesniffer": "^2.8"
     }
 }

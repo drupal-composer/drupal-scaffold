@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "465f1b30dedb8c641f933ab2aca89c7e",
+    "content-hash": "9d88d465dbe1352dbe70495d75cb6a65",
     "packages": [
         {
             "name": "composer/semver",
@@ -367,16 +367,16 @@
         },
         {
             "name": "g1a/composer-test-scenarios",
-            "version": "2.0.1",
+            "version": "dev-scenarios-lock",
             "source": {
                 "type": "git",
                 "url": "https://github.com/g1a/composer-test-scenarios.git",
-                "reference": "d9a7619f6e1c01498fad19c34539bd5b0d2506ef"
+                "reference": "bb5cfc94a37b6b89d0f6002b6ffed683b1774258"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/g1a/composer-test-scenarios/zipball/d9a7619f6e1c01498fad19c34539bd5b0d2506ef",
-                "reference": "d9a7619f6e1c01498fad19c34539bd5b0d2506ef",
+                "url": "https://api.github.com/repos/g1a/composer-test-scenarios/zipball/bb5cfc94a37b6b89d0f6002b6ffed683b1774258",
+                "reference": "bb5cfc94a37b6b89d0f6002b6ffed683b1774258",
                 "shasum": ""
             },
             "bin": [
@@ -396,7 +396,7 @@
                 }
             ],
             "description": "Useful scripts for testing multiple sets of Composer dependencies.",
-            "time": "2018-05-25T16:45:48+00:00"
+            "time": "2018-06-10T21:44:20+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -2139,7 +2139,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "composer/composer": 20
+        "composer/composer": 20,
+        "g1a/composer-test-scenarios": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
