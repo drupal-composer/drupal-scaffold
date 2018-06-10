@@ -34,7 +34,7 @@ before_install:
 install:
   - if [ -n "${PLATFORM_PHP}" ] ; then composer -n config platform.php "${PLATFORM_PHP}" ; fi
   - if [ -n "${SCENARIO}" ] ; then composer -n require --dev --no-update ${SCENARIO} ; fi
-  - 'composer ${DEPENDENCIES}'
+  - 'composer ${DEPENDENCIES-install}'
 
 before_script:
   - git config --global user.email "travisci@example.com"
