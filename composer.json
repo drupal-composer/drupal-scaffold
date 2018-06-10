@@ -19,8 +19,28 @@
             "dev-master": "2.0.x-dev"
         }
     },
+    "scripts": {
+        "cs": "phpcs --standard=PSR2 -n src",
+        "cbf": "phpcbf --standard=PSR2 -n src",
+        "unit": "phpunit --colors=always",
+        "lint": [
+            "find src -name '*.php' -print0 | xargs -0 -n1 php -l"
+        ],
+        "test": [
+            "@lint",
+            "@unit"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "7.0.8"
+        }
+    },
     "require-dev": {
         "composer/composer": "dev-master",
-        "phpunit/phpunit": "^4.4.0"
+        "phpunit/phpunit": "^6",
+        "squizlabs/php_codesniffer": "^2.8"
     }
 }
