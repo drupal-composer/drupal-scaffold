@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d88d465dbe1352dbe70495d75cb6a65",
+    "content-hash": "445ab29fa63d93c2f4ff7da62f90de16",
     "packages": [
         {
             "name": "composer/semver",
@@ -367,7 +367,7 @@
         },
         {
             "name": "g1a/composer-test-scenarios",
-            "version": "dev-scenarios-lock",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/g1a/composer-test-scenarios.git",
@@ -2139,8 +2139,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "composer/composer": 20,
-        "g1a/composer-test-scenarios": 20
+        "composer/composer": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
