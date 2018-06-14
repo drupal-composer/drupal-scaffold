@@ -56,6 +56,27 @@ class Handler {
     $this->composer = $composer;
     $this->io = $io;
     $this->progress = TRUE;
+
+    // Pre-load all of our sources so that we do not run up
+    // against problems in `composer update` operations.
+    $this->manualLoad();
+  }
+
+  protected function manualLoad() {
+    $src_dir = __DIR__;
+
+    $classes = [
+      'CommandProvider',
+      'DrupalScaffoldCommand',
+      'FileFetcher',
+      'PrestissimoFileFetcher',
+    ];
+
+    foreach ($classes as $src) {
+      if (!class_exists('\\DrupalComposer\\DrupalScaffold\\' . $src)) {
+        include "{$src_dir}/{$src}.php";
+      }
+    }
   }
 
   /**
