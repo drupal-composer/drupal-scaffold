@@ -6,8 +6,9 @@ use Composer\IO\NullIO;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
 use DrupalComposer\DrupalScaffold\FileFetcher;
+use PHPUnit\Framework\TestCase;
 
-class FetcherTest extends \PHPUnit_Framework_TestCase {
+class FetcherTest extends TestCase {
 
   /**
    * @var \Composer\Util\Filesystem
