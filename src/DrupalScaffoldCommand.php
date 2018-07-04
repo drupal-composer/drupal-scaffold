@@ -27,6 +27,9 @@ class DrupalScaffoldCommand extends BaseCommand {
    * {@inheritdoc}
    */
   protected function execute(InputInterface $input, OutputInterface $output) {
+    $vendorDir = $this->getComposer()->getConfig()->get('vendor-dir');
+    require $vendorDir . '/autoload.php';
+
     $handler = new Handler($this->getComposer(), $this->getIO());
     $handler->downloadScaffold();
     // Generate the autoload.php file after generating the scaffold files.

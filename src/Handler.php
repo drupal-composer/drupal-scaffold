@@ -14,6 +14,7 @@ use Composer\Package\PackageInterface;
 use Composer\Semver\Semver;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
+use GuzzleHttp\ClientInterface;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 /**
@@ -69,6 +70,7 @@ class Handler {
       'CommandProvider',
       'DrupalScaffoldCommand',
       'FileFetcher',
+      'GuzzleFileFetcher',
       'PrestissimoFileFetcher',
     ];
 
@@ -157,8 +159,9 @@ class Handler {
     $version = $this->getDrupalCoreVersion($drupalCorePackage);
 
     $remoteFs = new RemoteFilesystem($this->io);
+    $fetcherClass = $this->getFetcherClass();
 
-    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $this->io, $this->progress, $this->composer->getConfig());
+    $fetcher = new $fetcherClass($remoteFs, $options['source'], $this->io, $this->progress, $this->composer->getConfig());
     $fetcher->setFilenames(array_combine($files, $files));
     $fetcher->fetch($version, $webroot, TRUE);
 
@@ -406,6 +409,13 @@ EOF;
    */
   protected function getInitialDefault() {
     return [];
+  }
+
+  protected function getFetcherClass() {
+    if (interface_exists("\\GuzzleHttp\\ClientInterface") && Semver::satisfies(ClientInterface::VERSION, '^6')) {
+      return GuzzleFileFetcher::class;
+    }
+    return FileFetcher::class;
   }
 
 }

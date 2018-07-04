@@ -6,7 +6,8 @@
     "require": {
         "php": ">=5.4.5",
         "composer-plugin-api": "^1.0.0",
-        "composer/semver": "^1.4"
+        "composer/semver": "^1.4",
+        "guzzlehttp/guzzle": "^6.2.1"
     },
     "autoload": {
         "psr-4": {
