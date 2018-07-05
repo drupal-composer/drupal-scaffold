@@ -3,11 +3,12 @@
 namespace DrupalComposer\DrupalScaffold\Tests;
 
 use Composer\Util\Filesystem;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Base test Class for drupal-scaffold features.
  */
-abstract class BaseTest extends \PHPUnit_Framework_TestCase {
+abstract class BaseTest extends TestCase {
 
   /**
    * @var \Composer\Util\Filesystem
