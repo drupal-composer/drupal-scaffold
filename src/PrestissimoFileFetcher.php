@@ -73,6 +73,9 @@ class PrestissimoFileFetcher extends FileFetcher {
         }
       }
     } while ($multi->remain());
+    if ($failureCnt > 0) {
+       throw new \Exception("$failureCnt drupal scaffold files could not be downloaded");
+    }
   }
 
 }
