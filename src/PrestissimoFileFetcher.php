@@ -68,7 +68,9 @@ class PrestissimoFileFetcher extends FileFetcher {
       $result = $multi->getFinishedResults();
       $successCnt += $result['successCnt'];
       $failureCnt += $result['failureCnt'];
-      $errors += $result['errors'];
+      if (isset($result['errors'])) {
+        $errors += $result['errors'];
+      }
       if ($this->progress) {
         foreach ($result['urls'] as $url) {
           $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info>", TRUE);
