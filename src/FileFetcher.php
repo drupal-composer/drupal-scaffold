@@ -28,8 +28,25 @@ class FileFetcher {
    */
   protected $progress;
 
+  /**
+   * @var string
+   *
+   * The source url pattern.
+   */
   protected $source;
+
+  /**
+   * @var array
+   *
+   * A list of filename to fetch.
+   */
   protected $filenames;
+
+  /**
+   * @var \Composer\Util\Filesystem
+   *
+   * The local filesystem.
+   */
   protected $fs;
 
   /**
