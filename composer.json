@@ -4,7 +4,7 @@
     "type": "composer-plugin",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=5.4.5",
+        "php": "^5.5.9|>=7.0.8",
         "composer-plugin-api": "^1.0.0",
         "composer/semver": "^1.4"
     },
