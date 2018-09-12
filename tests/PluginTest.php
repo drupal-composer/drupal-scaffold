@@ -136,20 +136,20 @@ class PluginTest extends TestCase {
    * @return array
    */
   protected function composerJSONDefaults() {
-    return array(
-      'repositories' => array(
-        array(
+    return [
+      'repositories' => [
+        [
           'type' => 'vcs',
           'url' => $this->rootDir,
-        ),
-      ),
-      'require' => array(
+        ],
+      ],
+      'require' => [
         'drupal-composer/drupal-scaffold' => $this->tmpReleaseTag,
         'composer/installers' => '^1.0.20',
         'drupal/core' => '8.0.0',
-      ),
+      ],
       'minimum-stability' => 'dev',
-    );
+    ];
   }
 
   /**

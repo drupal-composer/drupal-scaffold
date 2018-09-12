@@ -322,7 +322,7 @@ EOF;
    */
   protected function getNamedOptionList($optionName, $defaultFn) {
     $options = $this->getOptions($this->composer);
-    $result = array();
+    $result = [];
     if (empty($options['omit-defaults'])) {
       $result = $this->$defaultFn();
     }

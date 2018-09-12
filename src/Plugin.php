@@ -39,21 +39,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    * {@inheritdoc}
    */
   public function getCapabilities() {
-    return array(
+    return [
       'Composer\Plugin\Capability\CommandProvider' => 'DrupalComposer\DrupalScaffold\CommandProvider',
-    );
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    return array(
+    return [
       PackageEvents::POST_PACKAGE_INSTALL => 'postPackage',
       PackageEvents::POST_PACKAGE_UPDATE => 'postPackage',
       ScriptEvents::POST_UPDATE_CMD => 'postCmd',
       PluginEvents::COMMAND => 'cmdBegins',
-    );
+    ];
   }
 
   /**
