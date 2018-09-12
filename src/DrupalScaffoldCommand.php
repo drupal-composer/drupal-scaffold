@@ -4,6 +4,7 @@ namespace DrupalComposer\DrupalScaffold;
 
 use Composer\Command\BaseCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -20,7 +21,10 @@ class DrupalScaffoldCommand extends BaseCommand {
     parent::configure();
     $this
       ->setName('drupal:scaffold')
-      ->setDescription('Update the Drupal scaffold files.');
+      ->setDescription('Update the Drupal scaffold files.')
+      ->setDefinition(array(
+        new InputOption('no-dev', NULL, InputOption::VALUE_NONE, 'Disables download of include-dev files.'),
+      ));
   }
 
   /**
@@ -28,7 +32,7 @@ class DrupalScaffoldCommand extends BaseCommand {
    */
   protected function execute(InputInterface $input, OutputInterface $output) {
     $handler = new Handler($this->getComposer(), $this->getIO());
-    $handler->downloadScaffold();
+    $handler->downloadScaffold(!$input->getOption('no-dev'));
     // Generate the autoload.php file after generating the scaffold files.
     $handler->generateAutoload();
   }
