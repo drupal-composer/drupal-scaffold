@@ -113,7 +113,7 @@ command callback to the `scripts`-section of your root `composer.json`, like thi
 ```
 
 After that you can manually download the scaffold files according to your
-configuration by using `composer drupal-scaffold`.
+configuration by using `composer drupal:scaffold`.
 
 It is assumed that the scaffold files will be committed to the repository, to
 ensure that the correct files are used on the CI server (see **Limitation**,
