@@ -143,7 +143,6 @@ class Handler {
    * Downloads drupal scaffold files for the current process.
    */
   public function downloadScaffold() {
-    $drupalCorePackage = $this->getDrupalCorePackage();
     $webroot = realpath($this->getWebRoot());
 
     // Collect options, excludes and settings files.
@@ -154,7 +153,22 @@ class Handler {
     $dispatcher = new EventDispatcher($this->composer, $this->io);
     $dispatcher->dispatch(self::PRE_DRUPAL_SCAFFOLD_CMD);
 
-    $version = $this->getDrupalCoreVersion($drupalCorePackage);
+    // First check for inline aliases. This allows a fork of drupal/core to be
+    // used, so that a require constraint of "8.6.1-patch1 as 8.6.1" will
+    // download the correct scaffolding files.
+    $aliases = $this->composer->getPackage()->getAliases();
+    $version = NULL;
+    foreach ($aliases as $alias) {
+      if ($alias['package'] == 'drupal/core') {
+        $version = $alias['alias'];
+      }
+    }
+
+    // No alias was found, so use the version from the package.
+    if (!$version) {
+      $drupalCorePackage = $this->getDrupalCorePackage();
+      $version = $this->getDrupalCoreVersion($drupalCorePackage);
+    }
 
     $remoteFs = new RemoteFilesystem($this->io);
 
