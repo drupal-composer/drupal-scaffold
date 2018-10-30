@@ -384,6 +384,10 @@ EOF;
       'sites/example.sites.php',
       'update.php',
       'web.config',
+      'modules/README.txt',
+      'profiles/README.txt',
+      'sites/README.txt',
+      'themes/README.txt',
     ];
 
     // Version specific variations.
