@@ -149,6 +149,7 @@ class Handler {
     // Collect options, excludes and settings files.
     $options = $this->getOptions();
     $files = array_diff($this->getIncludes(), $this->getExcludes());
+    $files = array_combine($files, $files);
 
     // Call any pre-scaffold scripts that may be defined.
     $dispatcher = new EventDispatcher($this->composer, $this->io);
@@ -158,12 +159,39 @@ class Handler {
 
     $remoteFs = new RemoteFilesystem($this->io);
 
-    $fetcher = new PrestissimoFileFetcher($remoteFs, $options['source'], $this->io, $this->progress, $this->composer->getConfig());
-    $fetcher->setFilenames(array_combine($files, $files));
-    $fetcher->fetch($version, $webroot, TRUE);
+    $fetcher = new PrestissimoFileFetcher($remoteFs, $this->io, $this->progress, $this->composer->getConfig());
+    $sources = (array) $options['source'];
+    $all_succeeded = FALSE;
 
-    $fetcher->setFilenames($this->getInitial());
-    $fetcher->fetch($version, $webroot, FALSE);
+    do {
+      $source = current($sources);
+
+      $fetcher->setSource($source);
+
+      $fetcher->setFilenames($files);
+      if ($fetcher->fetch($version, $webroot, TRUE)) {
+        $fetcher->setFilenames($this->getInitial());
+        if ($fetcher->fetch($version, $webroot, FALSE)) {
+          $all_succeeded = TRUE;
+          break;
+        }
+      }
+
+      // If here, it means that the fetch for this source has failed.
+      $next_source = next($sources);
+
+      $this->io->writeError('');
+      $this->io->writeError("  - Has failed with the " . (!$next_source ? 'last ' : '') . "source: <error>$source</error>", TRUE);
+      if ($next_source) {
+        $this->io->writeError("  - Now trying with the source: <warning>$next_source</warning>", TRUE);
+      }
+      $this->io->writeError('');
+
+    } while($next_source);
+
+    if (!$all_succeeded) {
+      throw new \Exception(implode("\r\n\r\n", $fetcher->getErrors()));
+    }
 
     // Call post-scaffold scripts.
     $dispatcher->dispatch(self::POST_DRUPAL_SCAFFOLD_CMD);
@@ -343,8 +371,10 @@ EOF;
       'excludes' => [],
       'includes' => [],
       'initial' => [],
-      'source' => 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
-      // Github: https://raw.githubusercontent.com/drupal/drupal/{version}/{path}
+      'source' => [
+        'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
+        'https://raw.githubusercontent.com/drupal/drupal/{version}/{path}'
+      ],
     ];
     return $options;
   }
