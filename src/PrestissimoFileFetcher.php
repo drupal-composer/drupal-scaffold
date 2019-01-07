@@ -80,7 +80,9 @@ class PrestissimoFileFetcher extends FileFetcher {
 
     $urls = array_keys($errors);
     if ($urls) {
-      throw new \Exception('Failed to download ' . implode(", ", $urls));
+      // Print the exact errors if verbose mode is turned on.
+      $url_error_list = $this->io->isVerbose() ? print_r($errors, TRUE) : implode(", ", $urls);
+      throw new \Exception('Failed to download ' . $url_error_list);
     }
   }
 
