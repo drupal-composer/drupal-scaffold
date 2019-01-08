@@ -32,11 +32,12 @@ before_install:
   - composer --version
 
 install:
-  - 'travis_wait 30 composer scenario "${SCENARIO}" "${DEPENDENCIES}"'
+  - 'composer scenario "${SCENARIO}" "${DEPENDENCIES}"'
 
 before_script:
   - git config --global user.email "travisci@example.com"
   - git config --global user.name "Travis CI Test"
+  - export COMPOSER_PROCESS_TIMEOUT=600
 
 script:
   - composer test
