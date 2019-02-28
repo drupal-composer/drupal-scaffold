@@ -62,26 +62,24 @@ class PrestissimoFileFetcher extends FileFetcher {
 
     $multi = new CurlMulti();
     $multi->setRequests($requests);
-    do {
-      $multi->setupEventLoop();
-      $multi->wait();
-      $result = $multi->getFinishedResults();
-      $successCnt += $result['successCnt'];
-      $failureCnt += $result['failureCnt'];
-      if (isset($result['errors'])) {
-        $errors += $result['errors'];
-      }
-      if ($this->progress) {
-        foreach ($result['urls'] as $url) {
-          $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info>", TRUE);
-        }
-      }
-    } while ($multi->remain());
-
-    $urls = array_keys($errors);
-    if ($urls) {
-      throw new \Exception('Failed to download ' . implode(", ", $urls));
-    }
+    try {
+       do {
+         $multi->setupEventLoop();
+         $multi->wait();
+         $result = $multi->getFinishedResults();
+         $successCnt += $result['successCnt'];
+         $failureCnt += $result['failureCnt'];
+         foreach ($result['urls'] as $url) {
+           if (isset($result['errors'][$url])) {
+             $this->io->writeError("  - Downloading <warning>$successCnt</warning>/<warning>$totalCnt</warning>: <warning>$url</warning>", TRUE);
+           } else {
+             $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info>", TRUE);
+           }
+         }
+       } while ($multi->remain());
+     } catch (FetchException $e) {
+         // do nothing
+     }
   }
 
 }
