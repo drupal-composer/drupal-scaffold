@@ -372,7 +372,7 @@ EOF;
       'includes' => [],
       'initial' => [],
       'source' => [
-        'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}',
+        'https://git.drupalcode.org/project/drupal/raw/{version}/{path}',
         'https://raw.githubusercontent.com/drupal/drupal/{version}/{path}'
       ],
     ];
@@ -397,7 +397,7 @@ EOF;
     /**
      * Files from 8.3.x
      *
-     * @see https://cgit.drupalcode.org/drupal/tree/?h=8.3.x
+     * @see https://git.drupalcode.org/project/drupal/tree/8.3.x
      */
     $common = [
       '.csslintrc',
