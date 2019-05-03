@@ -57,7 +57,8 @@ class FetcherTest extends TestCase {
   }
 
   public function testFetch() {
-    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), new NullIO());
+    $fetcher->setSource('https://git.drupalcode.org/project/drupal/raw/{version}/{path}');
     $fetcher->setFilenames([
       '.htaccess' => '.htaccess',
       'sites/default/default.settings.php' => 'sites/default/default.settings.php',
@@ -68,7 +69,8 @@ class FetcherTest extends TestCase {
   }
 
   public function testInitialFetch() {
-    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), 'https://cgit.drupalcode.org/drupal/plain/{path}?h={version}', new NullIO());
+    $fetcher = new FileFetcher(new RemoteFilesystem(new NullIO()), new NullIO());
+    $fetcher->setSource('https://git.drupalcode.org/project/drupal/raw/{version}/{path}');
     $fetcher->setFilenames([
       'sites/default/default.settings.php' => 'sites/default/settings.php',
     ]);

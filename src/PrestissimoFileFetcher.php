@@ -22,8 +22,8 @@ class PrestissimoFileFetcher extends FileFetcher {
   /**
    * Constructs this PrestissimoFileFetcher object.
    */
-  public function __construct(RemoteFilesystem $remoteFilesystem, $source, IOInterface $io, $progress = TRUE, Config $config) {
-    parent::__construct($remoteFilesystem, $source, $io, $progress);
+  public function __construct(RemoteFilesystem $remoteFilesystem, IOInterface $io, $progress = TRUE, Config $config) {
+    parent::__construct($remoteFilesystem, $io, $progress);
     $this->config = $config;
   }
 
@@ -32,10 +32,9 @@ class PrestissimoFileFetcher extends FileFetcher {
    */
   public function fetch($version, $destination, $override) {
     if (class_exists(CurlMulti::class)) {
-      $this->fetchWithPrestissimo($version, $destination, $override);
-      return;
+      return $this->fetchWithPrestissimo($version, $destination, $override);
     }
-    parent::fetch($version, $destination, $override);
+    return parent::fetch($version, $destination, $override);
   }
 
   /**
@@ -57,7 +56,7 @@ class PrestissimoFileFetcher extends FileFetcher {
     $errors = [];
     $totalCnt = count($requests);
     if ($totalCnt == 0) {
-      return;
+      return TRUE;
     }
 
     $multi = new CurlMulti();
@@ -70,6 +69,9 @@ class PrestissimoFileFetcher extends FileFetcher {
       $failureCnt += $result['failureCnt'];
       if (isset($result['errors'])) {
         $errors += $result['errors'];
+        foreach ($result['errors'] as $url => $error) {
+          $this->io->writeError("  - Downloading <comment>$successCnt</comment>/<comment>$totalCnt</comment>: <info>$url</info> (<error>failed</error>)", TRUE);
+        }
       }
       if ($this->progress) {
         foreach ($result['urls'] as $url) {
@@ -78,10 +80,20 @@ class PrestissimoFileFetcher extends FileFetcher {
       }
     } while ($multi->remain());
 
-    $urls = array_keys($errors);
-    if ($urls) {
-      throw new \Exception('Failed to download ' . implode(", ", $urls));
+    if ($errors) {
+      $this->addError('Failed to download: ' . "\r\n" . implode("\r\n", array_keys($errors)));
+      $errors_extra = [];
+      foreach($errors as $error) {
+        if ($error !== "0: " && !isset($errors_extra[$error])) {
+          $errors_extra[$error] = $error;
+        }
+      }
+      if ($errors_extra) {
+        $this->addError(implode("\r\n", $errors_extra));
+      }
+      return FALSE;
     }
+    return TRUE;
   }
 
 }

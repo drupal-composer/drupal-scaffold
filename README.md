@@ -30,7 +30,7 @@ of your root `composer.json`.
 {
   "extra": {
     "drupal-scaffold": {
-      "source": "https://cgit.drupalcode.org/drupal/plain/{path}?h={version}",
+      "source": "https://git.drupalcode.org/project/drupal/raw/{version}/{path}",
       "excludes": [
         "google123.html",
         "robots.txt"
@@ -51,6 +51,21 @@ The `source` option may be used to specify the URL to download the
 scaffold files from; the default source is drupal.org. The literal string
 `{version}` in the `source` option is replaced with the current version of
 Drupal core being updated prior to download.
+You can also define `source` as an array to have fallbacks in case of
+any HTTP issues.
+
+```json
+{
+  "extra": {
+    "drupal-scaffold": {
+      "source": [
+        "https://git.drupalcode.org/project/drupal/raw/{version}/{path}",
+        "https://raw.githubusercontent.com/drupal/drupal/{version}/{path}"
+      ]
+    }
+  }
+}
+```
 
 With the `drupal-scaffold` option `excludes`, you can provide additional paths
 that should not be copied or overwritten. The plugin provides no excludes by
