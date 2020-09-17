@@ -2,6 +2,14 @@
 
 [![Build Status](https://travis-ci.org/drupal-composer/drupal-scaffold.svg?branch=master)](https://travis-ci.org/drupal-composer/drupal-scaffold)
 
+# DEPRECATED - DO NOT USE
+
+This project is deprecated. Please use [drupal/core-composer-scaffold](https://github.com/drupal/core-composer-scaffold). 
+
+If you are still using this plugin because you are on Drupal 8.7.x or earlier, please note that it **is** possible to use core-composer-scaffold with older versions of Drupal 8. Start with the template project [drupal/recommended-project](https://github.com/drupal/recommended-project), and then pin to an earlier version of drupal/core-recommended after the initial create-project is done. Note that it's generally easier to remove composer.lock and vendor first when moving back to older versions of Drupal core.
+
+# OLD README FOLLOWS
+
 Composer plugin for automatically downloading Drupal scaffold files (like
 `index.php`, `update.php`, …) when using `drupal/core` via Composer.
 
